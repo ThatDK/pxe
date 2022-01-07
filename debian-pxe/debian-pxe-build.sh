@@ -47,7 +47,7 @@ mkdir /tftpboot/UEFI/pxelinux.cfg
 cd /tftpboot/distros/iso/
 wget https://mirror.web-ster.com/centos/8.5.2111/isos/x86_64/CentOS-8.5.2111-x86_64-dvd1.iso
 wget http://mirrors.gigenet.com/centos/7.9.2009/isos/x86_64/CentOS-7-x86_64-DVD-2009.iso
-wget https://cdimage.debian.org/cdimage/archive/11.1.0/amd64/iso-dvd/debian-11.2.0-amd64-DVD-1.iso
+wget https://cdimage.debian.org/cdimage/archive/11.1.0/amd64/iso-dvd/debian-11.1.0-amd64-DVD-1.iso
 wget https://cdimage.debian.org/cdimage/archive/10.11.0/amd64/iso-dvd/debian-10.11.0-amd64-DVD-1.iso
 wget https://cdimage.debian.org/cdimage/archive/9.13.0/amd64/iso-dvd/debian-9.13.0-amd64-DVD-1.iso
 wget https://downloads.freepbxdistro.org/ISO/SNG7-PBX-64bit-2104-1.iso
@@ -166,7 +166,7 @@ mount debian-10.11.0-amd64-DVD-1.iso /mnt
 cp -r /mnt/* /tftpboot/distros/debian10
 umount /mnt
 
-mount debian-11.2.0-amd64-DVD-1.iso /mnt
+mount debian-11.1.0-amd64-DVD-1.iso /mnt
 cp -r /mnt/* /tftpboot/distros/debian11
 umount /mnt
 
@@ -181,8 +181,8 @@ umount
 #Download debian kernel/initrd
 cd /tftpboot/distros/debian11/install.amd
 rm initrd.gz
-wget https://deb.debian.org/debian/dists/Debian11.2/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
-wget https://deb.debian.org/debian/dists/Debian11.2/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
+wget https://deb.debian.org/debian/dists/Debian11.1/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
+wget https://deb.debian.org/debian/dists/Debian11.1/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
 
 cd /tftpboot/distros/debian10/install.amd
 rm initrd.gz
