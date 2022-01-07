@@ -37,9 +37,9 @@ mkdir /tftpboot
 cd /tftpboot
 mkdir distros BIOS UEFI kickstart pxelinux.cfg
 cd /tftpboot/distros
-mkdir centos7 centos8 debian9 debian10 debain11 rhel7 rhel8 rhel9 iso
+mkdir centos7 centos8 debian9 debian10 debain11 iso
 cd /tftpboot/kickstart
-mkdir centos7 centos8 debian9 debian10 debain11 rhel7 rhel8 rhel9
+mkdir centos7 centos8 debian9 debian10 debain11
 mkdir /tftpboot/BIOS/pxelinux.cfg
 mkdir /tftpboot/UEFI/pxelinux.cfg
 
@@ -51,12 +51,6 @@ wget https://cdimage.debian.org/cdimage/archive/11.1.0/amd64/iso-dvd/debian-11.1
 wget https://cdimage.debian.org/cdimage/archive/10.11.0/amd64/iso-dvd/debian-10.11.0-amd64-DVD-1.iso
 wget https://cdimage.debian.org/cdimage/archive/9.13.0/amd64/iso-dvd/debian-9.13.0-amd64-DVD-1.iso
 wget https://downloads.freepbxdistro.org/ISO/SNG7-PBX-64bit-2104-1.iso
-wget https://access.cdn.redhat.com/content/origin/files/sha256/19/19d653ce2f04f202e79773a0cbeda82070e7527557e814ebbce658773fbe8191/rhel-server-7.9-x86_64-dvd.iso?_auth_=1641414827_a99e99827d3da68aa35593e6e935f28c
-wget https://access.cdn.redhat.com/content/origin/files/sha256/1f/1f78e705cd1d8897a05afa060f77d81ed81ac141c2465d4763c0382aa96cadd0/rhel-8.5-x86_64-dvd.iso?_auth_=1641414865_aaa53a4297749608efeccfe729db8997
-
-#Rename long, annoying rhel names
-mv rhel-8.5* rhel-8.5-x86_64-dvd.iso
-mv rhel-server-7.9* rhel-server-7.9-x86_64-dvd.iso
 
 #Build BIOS/UEFI menu structures
 cp /root/syslinux-6.03/bios/com32/menu/menu.c32 /tftpboot/BIOS
@@ -116,30 +110,6 @@ LABEL CentOS7
 
 MENU SEPARATOR
 
-#LABEL RedHat9
-#	TEXT HELP Unseeded Installer
-#	ENDTEXT
-#	kernel tftp://192.168.3.3/distros/rhel9/images/pxeboot/vmlinuz
-#	initrd tftp://192.168.3.3/distros/rhel9/images/pxeboot/initrd.img
-#	append vga=normal priority=high method=http://192.168.3.3/distros/rhel9/ 
-#ks=http://192.168.3.3/kickstart/rhel9/ks.cfg
-
-LABEL RedHat8
-	TEXT HELP Seeded Installer
-	ENDTEXT
-	kernel tftp://192.168.3.3/distros/rhel8/isolinux/vmlinuz
-	initrd tftp://192.168.3.3/distros/rhel8/isolinux/initrd.img
-	append vga=normal priority=high method=http://192.168.3.3/distros/rhel8/ ks=http://192.168.3.3/kickstart/rhel8/ks.cfg
-
-LABEL RedHat7
-	TEXT HELP Unseeded Installer
-	ENDTEXT
-	kernel tftp://192.168.3.3/distros/rhel7/images/pxeboot/vmlinuz
-	initrd tftp://192.168.3.3/distros/rhel7/images/pxeboot/initrd.img
-	append vga=normal priority=high method=http://192.168.3.3/distros/rhel7/ ks=http://192.168.3.3/kickstart/rhel7/ks.cfg
-
-MENU SEPARATOR
-
 LABEL FreePBX
 	TEXT HELP Unseeded Installer
 	ENDTEXT
@@ -170,14 +140,6 @@ mount debian-11.1.0-amd64-DVD-1.iso /mnt
 cp -r /mnt/* /tftpboot/distros/debian11
 umount /mnt
 
-mount rhel-server-7.9-x86_64-dvd.iso /mnt
-cp -r /mnt/* /tftpboot/distros/rhel7
-umount
-
-mount rhel-8.5-x86_64-dvd.iso /mnt
-cp -r /mnt/* /tftpboot/distros/rhel8
-umount
-
 #Download debian kernel/initrd
 cd /tftpboot/distros/debian11/install.amd
 rm initrd.gz
@@ -201,8 +163,6 @@ cp debian10/preseed.cfg /tftpboot/kickstart/debian10
 cp debian11/preseed.cfg /tftpboot/kickstart/debian11
 cp centos7/ks.cfg /tftpboot/kickstart/centos7
 cp centos8/ks.cfg /tftpboot/kickstart/centos8
-cp rhel7/ks.cfg /tftpboot/kickstart/rhel7
-cp rhel8/ks.cfg /tftpboot/kickstart/rhel8
 
 #Install DHCP server
 apt-get install isc-dhcp-server -y
