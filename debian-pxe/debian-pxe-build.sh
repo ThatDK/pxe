@@ -13,8 +13,7 @@ else
 	exit 1
 fi
 
-BASEDIR=$(dirname $0)
-if [ ${PWD} = "${BASEDIR}" ]; then
+if [ ${PWD} = "~" ]; then
 	echo "Running from /root directory. Ok."
 else
 	echo "Must run from /root directory. FAILED."
