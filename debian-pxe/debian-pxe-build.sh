@@ -13,7 +13,7 @@ else
 	exit 1
 fi
 
-if [ ${PWD} = "~" ]; then
+if [ ${PWD} = "/root" ]; then
 	echo "Running from /root directory. Ok."
 else
 	echo "Must run from /root directory. FAILED."
