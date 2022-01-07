@@ -4,6 +4,7 @@
 #Written by Edward Dembecki
 #Writted for Debian based ditributions
 #Must run as root
+
 # Checking install is run as root.
 if [ $(whoami) = "root" ]; then
 	echo "Install running as root. Ok."
@@ -14,9 +15,9 @@ fi
 
 BASEDIR=$(dirname $0)
 if [ ${PWD} = "${BASEDIR}" ]; then
-	echo "Running from matching directory. Ok."
+	echo "Running from /root directory. Ok."
 else
-	echo "Must run from matching directory. FAILED."
+	echo "Must run from /root directory. FAILED."
 	exit 1
 fi
 
@@ -232,4 +233,4 @@ echo "Info: You will need to change the IP address to match your server within t
 /tftpboot/pxelinux.cfg/default
 /etc/dhcp/dhcpd.conf
 /tftpboot/kickstart/*"
-echo "Info: You will need to change the passwords (currently hashed) within the /tftpboot/kickstart files"
+echo "Info: You will need to change the passwords (currently empty) within the /tftpboot/kickstart files"
