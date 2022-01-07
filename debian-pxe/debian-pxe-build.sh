@@ -64,7 +64,7 @@ cp /root/syslinux-6.03/bios/core/pxelinux.0 /tftpboot/BIOS
 cp /root/syslinux-6.03/bios/com32/libutil/libutil.c32 /tftpboot/BIOS
 cp /root/syslinux-6.03/bios/com32/elflink/ldlinux/ldlinux.c32 /tftpboot/BIOS
 cp /root/syslinux-6.03/efi64/com32/elflink/ldlinux/ldlinux.e64 /tftpboot/UEFI
-cp /root/syslinux-6.03/efi64/libutil/libutil.c32 /tftpboot/UEFI
+cp /root/syslinux-6.03/efi64/com32/libutil/libutil.c32 /tftpboot/UEFI
 cp /root/syslinux-6.03/efi64/com32/menu/menu.c32 /tftpboot/UEFI
 cp /root/syslinux-6.03/efi64/efi/syslinux.efi /tftpboot/UEFI
 
