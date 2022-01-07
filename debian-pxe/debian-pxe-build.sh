@@ -47,7 +47,7 @@ mkdir /tftpboot/UEFI/pxelinux.cfg
 cd /tftpboot/distros/iso/
 wget https://mirror.web-ster.com/centos/8.5.2111/isos/x86_64/CentOS-8.5.2111-x86_64-dvd1.iso
 wget http://mirrors.gigenet.com/centos/7.9.2009/isos/x86_64/CentOS-7-x86_64-DVD-2009.iso
-wget https://cdimage.debian.org/cdimage/archive/11.2.0/amd64/iso-dvd/debian-11.2.0-amd64-DVD-1.iso
+wget https://cdimage.debian.org/cdimage/archive/11.1.0/amd64/iso-dvd/debian-11.2.0-amd64-DVD-1.iso
 wget https://cdimage.debian.org/cdimage/archive/10.11.0/amd64/iso-dvd/debian-10.11.0-amd64-DVD-1.iso
 wget https://cdimage.debian.org/cdimage/archive/9.13.0/amd64/iso-dvd/debian-9.13.0-amd64-DVD-1.iso
 wget https://downloads.freepbxdistro.org/ISO/SNG7-PBX-64bit-2104-1.iso
