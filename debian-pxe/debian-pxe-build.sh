@@ -20,9 +20,6 @@ else
 	exit 1
 fi
 
-#Copying files to /root
-cp ../
-
 #Install tftpd
 apt-get install tftpd-hpa -y
 
