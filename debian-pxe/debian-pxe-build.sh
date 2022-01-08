@@ -202,6 +202,6 @@ exit 1
 
 #else if [ $(cat/etc | grep redhat-release) = "redhat-release ]; then
 #
-#else	echo "Unknown version. FAILED"
-#	exit 1
+else	echo "Unknown version. FAILED"
+	exit 1
 fi
