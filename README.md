@@ -7,3 +7,5 @@ The preseeds included do not have a username or password in them (for security p
 The script was thought of and thrown together quickly and I feel like it could be more efficient.
 
 This is a personal project.
+
+I do intend to write this for other ditros at some point, and in the same script.
