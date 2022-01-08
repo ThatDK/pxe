@@ -20,7 +20,7 @@ else
 	exit 1
 fi
 
-if [ $(cat /etc | grep debian_version) = "debian_version" ]; then
+if [ "$(ls /etc | grep debian_version)" = "debian_version" ]; then
 	echo "Version detected: Debian"
 #Install tftpd
 apt-get install tftpd-hpa -y
