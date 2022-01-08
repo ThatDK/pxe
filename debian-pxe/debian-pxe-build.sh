@@ -20,8 +20,8 @@ else
 	exit 1
 fi
 
-#if [ $(cat /etc | grep debian_version) = "debian_version" ]; then
-#	echo "Version detected: Debian"
+if [ $(cat /etc | grep debian_version) = "debian_version" ]; then
+	echo "Version detected: Debian"
 #Install tftpd
 apt-get install tftpd-hpa -y
 
@@ -78,21 +78,24 @@ LABEL Debian11
 	ENDTEXT
 	kernel tftp://192.168.3.3/distros/debian11/install.amd/linux
 	initrd tftp://192.168.3.3/distros/debian11/install.amd/initrd.gz
-	append vga=normal priority=high auto=true auto url=tftp://192.168.3.3/kickstart/debian11/preseed.cfg
+	append vga=normal priority=high
+#auto=true auto url=tftp://192.168.3.3/kickstart/debian11/preseed.cfg
 
 LABEL Debian10
 	TEXT HELP Seeded Installer
 	ENDTEXT
 	kernel tftp://192.168.3.3/distros/debian10/install.amd/linux
 	initrd tftp://192.168.3.3/distros/debian10/install.amd/initrd.gz
-	append vga=normal priority=high auto=true auto url=tftp://192.168.3.3/kickstart/debian10/preseed.cfg
+	append vga=normal priority=high
+#auto=true auto url=tftp://192.168.3.3/kickstart/debian10/preseed.cfg
 
 LABEL Debian9
 	TEXT HELP Seeded Installer
 	ENDTEXT
 	kernel tftp://192.168.3.3/distros/debian9/install.amd/linux
 	initrd tftp://192.168.3.3/distros/debian9/install.amd/initrd.gz
-	append vga=normal priority=high auto=true auto url=tftp://192.168.3.3/kickstart/debian9/preseed.cfg
+	append vga=normal priority=high
+#auto=true auto url=tftp://192.168.3.3/kickstart/debian9/preseed.cfg
 
 MENU SEPARATOR
 
@@ -101,14 +104,16 @@ LABEL CentOS8
 	ENDTEXT
 	kernel tftp://192.168.3.3/distros/centos8/images/pxeboot/vmlinuz
 	initrd tftp://192.168.3.3/distros/centos8/images/pxeboot/initrd.img
-	append vga=normal priority=high method=http://192.168.3.3/distros/centos8/ ks=http://192.168.3.3/kickstart/centos8/ks.cfg
+	append vga=normal priority=high method=http://192.168.3.3/distros/centos8/
+#ks=http://192.168.3.3/kickstart/centos8/ks.cfg
 
 LABEL CentOS7
 	TEXT HELP Seeded Installer
 	ENDTEXT
 	kernel tftp://192.168.3.3/distros/centos7/images/pxeboot/vmlinuz
 	initrd tftp://192.168.3.3/distros/centos7/images/pxeboot/initrd.img
-	append vga=normal priority=high method=http://192.168.3.3/distros/centos7/ ks=http://192.168.3.3/kickstart/centos7/ks.cfg
+	append vga=normal priority=high method=http://192.168.3.3/distros/centos7/
+#ks=http://192.168.3.3/kickstart/centos7/ks.cfg
 
 MENU SEPARATOR
 
@@ -117,7 +122,8 @@ LABEL FreePBX
 	ENDTEXT
 	kernel tftp://192.168.3.3/distros/freepbx/images/pxeboot/vmlinuz
 	initrd tftp://192.168.3.3/distros/freepbx/images/pxeboot/initrd.img
-	append vga=normal priority=high method=http://192.168.3.3/distros/freepbx/ ks=http://192.168.3.3/kickstart/freepbx/ks.cfg" >> /tftpboot/pxelinux.cfg/default
+	append vga=normal priority=high method=http://192.168.3.3/distros/freepbx/
+#ks=http://192.168.3.3/kickstart/freepbx/ks.cfg" >> /tftpboot/pxelinux.cfg/default
 
 #Unpack ISOs
 cd /tftpboot/distros/iso
