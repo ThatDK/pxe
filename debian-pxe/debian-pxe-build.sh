@@ -5,7 +5,7 @@
 #Writted for Debian based ditributions
 #Must run as root
 
-# Checking install is run as root.
+#Checking install is run as root.
 if [ $(whoami) = "root" ]; then
 	echo "Install running as root. Ok."
 else
@@ -20,6 +20,8 @@ else
 	exit 1
 fi
 
+#if [ $(cat /etc | grep debian_version) = "debian_version" ]; then
+#	echo "Version detected: Debian"
 #Install tftpd
 apt-get install tftpd-hpa -y
 
@@ -99,14 +101,14 @@ LABEL CentOS8
 	ENDTEXT
 	kernel tftp://192.168.3.3/distros/centos8/images/pxeboot/vmlinuz
 	initrd tftp://192.168.3.3/distros/centos8/images/pxeboot/initrd.img
-	append vga=normal priority=high method=http://192.168.3.3/kickstart/centos8/ ks=http://192.168.3.3/kickstart/centos8/ks.cfg
+	append vga=normal priority=high method=http://192.168.3.3/distros/centos8/ ks=http://192.168.3.3/kickstart/centos8/ks.cfg
 
 LABEL CentOS7
 	TEXT HELP Seeded Installer
 	ENDTEXT
 	kernel tftp://192.168.3.3/distros/centos7/images/pxeboot/vmlinuz
 	initrd tftp://192.168.3.3/distros/centos7/images/pxeboot/initrd.img
-	append vga=normal priority=high method=http://192.168.3.3/kickstart/centos7/ ks=http://192.168.3.3/kickstart/centos7/ks.cfg
+	append vga=normal priority=high method=http://192.168.3.3/distros/centos7/ ks=http://192.168.3.3/kickstart/centos7/ks.cfg
 
 MENU SEPARATOR
 
@@ -141,10 +143,10 @@ cp -r /mnt/* /tftpboot/distros/debian11
 umount /mnt
 
 #Download debian kernel/initrd
-cd /tftpboot/distros/debian11/install.amd
+cd /tftpboot/distros/debian11/install.amd/
 rm initrd.gz
-wget https://deb.debian.org/debian/dists/Debian11.1/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
-wget https://deb.debian.org/debian/dists/Debian11.1/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
+wget https://deb.debian.org/debian/dists/Debian11.2/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
+wget https://deb.debian.org/debian/dists/Debian11.2/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
 
 cd /tftpboot/distros/debian10/install.amd
 rm initrd.gz
@@ -190,3 +192,10 @@ echo "Info: You will need to change the IP address to match your server within t
 /etc/dhcp/dhcpd.conf
 /tftpboot/kickstart/*"
 echo "Info: You will need to change the passwords (currently empty) within the /tftpboot/kickstart files"
+exit 1
+
+#else if [ $(cat/etc | grep redhat-release) = "redhat-release ]; then
+#
+#	echo "Unknown version. FAILED"
+#	exit 1
+#fi
