@@ -37,9 +37,9 @@ mkdir /tftpboot
 cd /tftpboot
 mkdir distros BIOS UEFI kickstart pxelinux.cfg
 cd /tftpboot/distros
-mkdir centos7 centos8 debian9 debian10 debain11 iso
+mkdir centos7 centos8 debian9 debian10 debian11 iso
 cd /tftpboot/kickstart
-mkdir centos7 centos8 debian9 debian10 debain11
+mkdir centos7 centos8 debian9 debian10 debian11
 mkdir /tftpboot/BIOS/pxelinux.cfg
 mkdir /tftpboot/UEFI/pxelinux.cfg
 
