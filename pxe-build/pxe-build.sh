@@ -200,7 +200,7 @@ echo "Info: You will need to change the IP address to match your server within t
 echo "Info: You will need to change the passwords (currently empty) within the /tftpboot/kickstart files"
 exit 1
 
-#else if [ $(cat/etc | grep redhat-release) = "redhat-release ]; then
+#else if [ $(ls /etc | grep redhat-release) = "redhat-release" ]; then
 #
 else	echo "Unknown version. FAILED"
 	exit 1
