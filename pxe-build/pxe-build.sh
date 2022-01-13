@@ -217,7 +217,7 @@ echo "Info: You will need to change the passwords (currently empty) within the /
 fi
 
 else if [ $(ls /etc | grep redhat-release) = "redhat-release" ]; then
-	echo "Rhel distro detected."
+	echo "Rhel distro detected. Temporary Failure while developing"
 	exit 1
 else
 	echo "Unknown version. FAILED"
