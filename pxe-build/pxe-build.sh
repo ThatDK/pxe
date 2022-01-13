@@ -5,7 +5,7 @@
 #Writted for Debian based ditributions
 #Must run as root
 
-#Checking install is run as root
+#Checking install is run as root.
 if [ $(ls needed-files | grep dhcpd.conf) = "dhcpd.conf" ] &&\
 [ $(ls needed-files | grep syslinux-6.03) = "syslinux-6.03" ] &&\
 [ $(ls needed-files/debian11/ | grep preseed.cfg) = "preseed.cfg" ] &&\
