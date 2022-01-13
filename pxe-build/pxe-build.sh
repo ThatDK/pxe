@@ -213,7 +213,8 @@ echo "Info: You will need to change the IP address to match your server within t
 /tftpboot/pxelinux.cfg/default
 /tftpboot/kickstart/*"
 echo "Info: You will need to change the passwords (currently empty) within the /tftpboot/kickstart files"
-exit 1
+	exit 1
+fi
 
 else if [ $(ls /etc | grep redhat-release) = "redhat-release" ]; then
 	echo "Rhel distro detected."
