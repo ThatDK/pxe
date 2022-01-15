@@ -5,7 +5,7 @@
 #Writted for Debian based ditributions
 #Must run as root
 
-#Checking install is run as root.
+#Checking for needed files
 if [ $(ls needed-files | grep dhcpd.conf) = "dhcpd.conf" ] &&\
 [ $(ls needed-files | grep syslinux-6.03) = "syslinux-6.03" ] &&\
 [ $(ls needed-files/debian11/ | grep preseed.cfg) = "preseed.cfg" ] &&\
@@ -20,6 +20,7 @@ else
         exit 1
 fi
 
+#Checking install is run as root.
 if [ $(whoami) = "root" ]; then
 	echo "Install running as root. Ok."
 else
@@ -27,6 +28,7 @@ else
 	exit 1
 fi
 
+#Checking directory
 if [ ${PWD} = "/root" ]; then
 	echo "Running from /root directory. Ok."
 else
@@ -34,6 +36,7 @@ else
 	exit 1
 fi
 
+#Checking distro
 if [ "$(ls /etc | grep debian_version)" = "debian_version" ]; then
 	echo "Debian distro detected."
 #Install tftpd
@@ -206,15 +209,21 @@ ln -s ../../pxelinux.cfg/default .
 cd /tftpboot/UEFI/pxelinux.cfg/
 ln -s ../../pxelinux.cfg/default .
 
+echo "#Make sure to change the IPs to the IP of your system." > /etc/dhcp/dhcpd.conf
 nano /etc/dhcp/dhcpd.conf
+echo "#Make sure to change the IPs to the IP of your system." > /tftpboot/pxelinux.cfg/default
+nano /tftpboot/pxelinux.cfg/default
+
+#Restart needed services
+systemctl restrt tftp-hpa.service
+systemctl restart apache*
+
 
 #Warning
-echo "Info: You will need to change the IP address to match your server within the following files
-/tftpboot/pxelinux.cfg/default
+echo "Info: You will need to change the IP address to match your server within the kickstart files
 /tftpboot/kickstart/*"
 echo "Info: You will need to change the passwords (currently empty) within the /tftpboot/kickstart files"
 	exit 1
-fi
 
 else if [ $(ls /etc | grep redhat-release) = "redhat-release" ]; then
 	echo "Rhel distro detected. Temporary Failure while developing"
