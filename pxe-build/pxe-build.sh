@@ -16,13 +16,7 @@ cd ..
 
 #Checking for needed files
 if [ $(ls needed-files | grep dhcpd.conf) = "dhcpd.conf" ] &&\
-[ $(ls needed-files | grep syslinux-6.03) = "syslinux-6.03" ] &&\
-[ $(ls needed-files/debian11/ | grep preseed.cfg) = "preseed.cfg" ] &&\
-[ $(ls needed-files/debian10/ | grep preseed.cfg) = "preseed.cfg" ] &&\
-[ $(ls needed-files/debian9/ | grep preseed.cfg) = "preseed.cfg" ] &&\
-[ $(ls needed-files/centos8/ | grep ks.cfg) = "ks.cfg" ] &&\
-[ $(ls needed-files/centos7/ | grep ks.cfg) = "ks.cfg" ] &&\
-[ $(ls needed-files/freepbx/ | grep ks.cfg) = "ks.cfg" ]; then
+[ $(ls needed-files | grep syslinux-6.03*) "syslinux-6.03*" ];
 	echo "Setup files found."
 else
 	echo "Failed to locate needed files."
