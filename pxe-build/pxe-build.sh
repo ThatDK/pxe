@@ -12,11 +12,12 @@ wget --no-check-certificate https://mirrors.edge.kernel.org/pub/linux/utils/boot
 #Unpacking syslinux
 echo 'Unpacking'
 tar -xvzf syslinux-6.03-pre9.tar.gz
+rm syslinux-6.03-pre9.tar.gz
 cd ..
 
 #Checking for needed files
-if [ $(ls needed-files | grep dhcpd.conf) = "dhcpd.conf" ] &&\
-[ $(ls needed-files | grep syslinux-6.03*) "syslinux-6.03*" ]; then
+if [ "$(ls needed-files | grep dhcpd.conf)" = "dhcpd.conf" ] &&\
+[ "$(ls needed-files | grep syslinux-6.03-pre9)" = "syslinux-6.03-pre9" ]; then
 	echo "Setup files found."
 else
 	echo "Failed to locate needed files."
@@ -228,7 +229,7 @@ echo "Info: You will need to change the IP address to match your server within t
 echo "Info: You will need to change the passwords (currently empty) within the /tftpboot/kickstart files"
 	exit 1
 
-else if [ $(ls /etc | grep redhat-release) = "redhat-release" ]; then
+elif [ $(ls /etc | grep redhat-release) = "redhat-release" ]; then
 	echo "Rhel distro detected. Temporary Failure while developing"
 	exit 1
 else
