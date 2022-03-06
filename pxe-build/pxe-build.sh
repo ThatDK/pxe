@@ -223,11 +223,15 @@ systemctl restrt tftp-hpa.service
 systemctl restart apache*
 
 
-#Warning
+#Info
 echo "Info: You will need to change the IP address to match your server within the kickstart files /tftpboot/kickstart/*"
-echo "Info: You will need to change the IP address to match your server within the kickstart files /tftpboot/kickstart/*" >> ~/Warning
+echo "Info: You will need to change the IP address to match your server within the kickstart files /tftpboot/kickstart/*" >> ~/Info
 echo "Info: You will need to change the passwords (currently empty) within the /tftpboot/kickstart files"
-echo "Info: You will need to change the passwords (currently empty) within the /tftpboot/kickstart files" >> ~/Warning
+echo "Info: You will need to change the passwords (currently empty) within the /tftpboot/kickstart files" >> ~/Info
+echo "Info: You will need to add users to the /tftpboot/kickstart files."
+echo "Info: You will need to add users to the /tftpboot/kickstart files." >> ~/Info
+echo "Info: You will need to change IP addresses in /tftpboot/pxelinux.cfg/default file."
+echo "Info: You will need to change IP addresses in /tftpboot/pxelinux.cfg/default file." >> ~/Info
 	exit 1
 
 elif [ $(ls /etc | grep redhat-release) = "redhat-release" ]; then
