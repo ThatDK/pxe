@@ -60,15 +60,14 @@ mkdir /tftpboot
 cd /tftpboot
 mkdir distros BIOS UEFI kickstart pxelinux.cfg
 cd /tftpboot/distros
-mkdir centos7 centos8 debian9 debian10 debian11 freepbx iso
+mkdir centos7 debian9 debian10 debian11 freepbx iso
 cd /tftpboot/kickstart
-mkdir centos7 centos8 debian9 debian10 debian11 freepbx
+mkdir centos7 debian9 debian10 debian11 freepbx
 mkdir /tftpboot/BIOS/pxelinux.cfg
 mkdir /tftpboot/UEFI/pxelinux.cfg
 
 #Pull ISOs
 cd /tftpboot/distros/iso/
-wget https://mirror.web-ster.com/centos/8.5.2111/isos/x86_64/CentOS-8.5.2111-x86_64-dvd1.iso
 wget http://mirrors.gigenet.com/centos/7.9.2009/isos/x86_64/CentOS-7-x86_64-DVD-2009.iso
 wget https://cdimage.debian.org/cdimage/archive/11.1.0/amd64/iso-dvd/debian-11.1.0-amd64-DVD-1.iso
 wget https://cdimage.debian.org/cdimage/archive/10.11.0/amd64/iso-dvd/debian-10.11.0-amd64-DVD-1.iso
@@ -120,14 +119,6 @@ LABEL Debian9
 
 MENU SEPARATOR
 
-LABEL CentOS8
-	TEXT HELP Seeded Installer
-	ENDTEXT
-	kernel tftp://192.168.3.3/distros/centos8/images/pxeboot/vmlinuz
-	initrd tftp://192.168.3.3/distros/centos8/images/pxeboot/initrd.img
-	append vga=normal priority=high method=http://192.168.3.3/distros/centos8/
-#ks=http://192.168.3.3/kickstart/centos8/ks.cfg
-
 LABEL CentOS7
 	TEXT HELP Seeded Installer
 	ENDTEXT
@@ -148,10 +139,6 @@ LABEL FreePBX
 
 #Unpack ISOs
 cd /tftpboot/distros/iso
-
-mount CentOS-8.5.2111-x86_64-dvd1.iso /mnt
-cp -r /mnt/* /tftpboot/distros/centos8
-umount /mnt
 
 mount CentOS-7-x86_64-DVD-2009.iso /mnt
 cp -r /mnt/* /tftpboot/distros/centos7
@@ -191,7 +178,6 @@ cp pxe-build/needed-files/debian9/preseed.cfg /tftpboot/kickstart/debian9
 cp pxe-build/needed-files/debian10/preseed.cfg /tftpboot/kickstart/debian10
 cp pxe-build/needed-files/debian11/preseed.cfg /tftpboot/kickstart/debian11
 cp pxe-build/needed-files/centos7/ks.cfg /tftpboot/kickstart/centos7
-cp pxe-build/needed-files/centos8/ks.cfg /tftpboot/kickstart/centos8
 cp pxe-build/needed-files/freepbx/ks.cfg /tftpboot/kickstart/freepbx
 
 #Install DHCP server
@@ -225,13 +211,13 @@ systemctl restart apache*
 
 #Info
 echo "Info: You will need to change the IP address to match your server within the kickstart files /tftpboot/kickstart/*"
-echo "Info: You will need to change the IP address to match your server within the kickstart files /tftpboot/kickstart/*" >> ~/Info
+echo "Info: You will need to change the IP address to match your server within the kickstart files /tftpboot/kickstart/*" >> ~/pxe-info
 echo "Info: You will need to change the passwords (currently empty) within the /tftpboot/kickstart files"
-echo "Info: You will need to change the passwords (currently empty) within the /tftpboot/kickstart files" >> ~/Info
+echo "Info: You will need to change the passwords (currently empty) within the /tftpboot/kickstart files" >> ~/pxe-info
 echo "Info: You will need to add users to the /tftpboot/kickstart files."
-echo "Info: You will need to add users to the /tftpboot/kickstart files." >> ~/Info
+echo "Info: You will need to add users to the /tftpboot/kickstart files." >> ~/pxe-nfo
 echo "Info: You will need to change IP addresses in /tftpboot/pxelinux.cfg/default file."
-echo "Info: You will need to change IP addresses in /tftpboot/pxelinux.cfg/default file." >> ~/Info
+echo "Info: You will need to change IP addresses in /tftpboot/pxelinux.cfg/default file." >> ~/pxe-info
 	exit 1
 
 elif [ $(ls /etc | grep redhat-release) = "redhat-release" ]; then
