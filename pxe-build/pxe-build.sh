@@ -16,7 +16,7 @@ cd ..
 
 #Checking for needed files
 if [ $(ls needed-files | grep dhcpd.conf) = "dhcpd.conf" ] &&\
-[ $(ls needed-files | grep syslinux-6.03*) "syslinux-6.03*" ];
+[ $(ls needed-files | grep syslinux-6.03*) "syslinux-6.03*" ]; then
 	echo "Setup files found."
 else
 	echo "Failed to locate needed files."
