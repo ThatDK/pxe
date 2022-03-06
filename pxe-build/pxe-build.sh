@@ -13,11 +13,11 @@ wget --no-check-certificate https://mirrors.edge.kernel.org/pub/linux/utils/boot
 echo 'Unpacking'
 tar -xvzf syslinux-6.03-pre9.tar.gz
 rm syslinux-6.03-pre9.tar.gz
-cd ..
+cd ~
 
 #Checking for needed files
-if [ "$(ls needed-files | grep dhcpd.conf)" = "dhcpd.conf" ] &&\
-[ "$(ls needed-files | grep syslinux-6.03-pre9)" = "syslinux-6.03-pre9" ]; then
+if [ "$(ls pxe-build/needed-files | grep dhcpd.conf)" = "dhcpd.conf" ] &&\
+[ "$(ls pxe-build/needed-files | grep syslinux-6.03-pre9)" = "syslinux-6.03-pre9" ]; then
 	echo "Setup files found."
 else
 	echo "Failed to locate needed files."
@@ -76,14 +76,14 @@ wget https://cdimage.debian.org/cdimage/archive/9.13.0/amd64/iso-dvd/debian-9.13
 wget https://downloads.freepbxdistro.org/ISO/SNG7-PBX-64bit-2104-1.iso
 
 #Build BIOS/UEFI menu structures
-cp /root/needed-files/syslinux-6.03/bios/com32/menu/menu.c32 /tftpboot/BIOS
-cp /root/needed-files/syslinux-6.03/bios/core/pxelinux.0 /tftpboot/BIOS
+cp /root/pxe-build/needed-files/syslinux-6.03/bios/com32/menu/menu.c32 /tftpboot/BIOS
+cp /root/pxe-build/needed-files/syslinux-6.03/bios/core/pxelinux.0 /tftpboot/BIOS
 cp /root/needed-files/syslinux-6.03/bios/com32/libutil/libutil.c32 /tftpboot/BIOS
-cp /root/needed-files/syslinux-6.03/bios/com32/elflink/ldlinux/ldlinux.c32 /tftpboot/BIOS
-cp /root/needed-files/syslinux-6.03/efi64/com32/elflink/ldlinux/ldlinux.e64 /tftpboot/UEFI
-cp /root/needed-files/syslinux-6.03/efi64/com32/libutil/libutil.c32 /tftpboot/UEFI
-cp /root/needed-files/syslinux-6.03/efi64/com32/menu/menu.c32 /tftpboot/UEFI
-cp /root/needed-files/syslinux-6.03/efi64/efi/syslinux.efi /tftpboot/UEFI
+cp /root/pxe-build/needed-files/syslinux-6.03/bios/com32/elflink/ldlinux/ldlinux.c32 /tftpboot/BIOS
+cp /root/pxe-build/needed-files/syslinux-6.03/efi64/com32/elflink/ldlinux/ldlinux.e64 /tftpboot/UEFI
+cp /root/pxe-build/needed-files/syslinux-6.03/efi64/com32/libutil/libutil.c32 /tftpboot/UEFI
+cp /root/pxe-build/needed-files/syslinux-6.03/efi64/com32/menu/menu.c32 /tftpboot/UEFI
+cp /root/pxe-build/needed-files/syslinux-6.03/efi64/efi/syslinux.efi /tftpboot/UEFI
 
 #PXE menu contents
 echo "#PXE script written by Edward Dembecki
@@ -187,17 +187,17 @@ wget https://deb.debian.org/debian/dists/Debian9.13/main/installer-amd64/current
 
 #Build preseeds
 cd /root
-cp needed-files/debian9/preseed.cfg /tftpboot/kickstart/debian9
-cp needed-files/debian10/preseed.cfg /tftpboot/kickstart/debian10
-cp needed-files/debian11/preseed.cfg /tftpboot/kickstart/debian11
-cp needed-files/centos7/ks.cfg /tftpboot/kickstart/centos7
-cp needed-files/centos8/ks.cfg /tftpboot/kickstart/centos8
-cp needed-files/freepbx/ks.cfg /tftpboot/kickstart/freepbx
+cp pxe-build/needed-files/debian9/preseed.cfg /tftpboot/kickstart/debian9
+cp pxe-build/needed-files/debian10/preseed.cfg /tftpboot/kickstart/debian10
+cp pxe-build/needed-files/debian11/preseed.cfg /tftpboot/kickstart/debian11
+cp pxe-build/needed-files/centos7/ks.cfg /tftpboot/kickstart/centos7
+cp pxe-build/needed-files/centos8/ks.cfg /tftpboot/kickstart/centos8
+cp pxe-build/needed-files/freepbx/ks.cfg /tftpboot/kickstart/freepbx
 
 #Install DHCP server
 apt-get install isc-dhcp-server -y
 cd /root
-cp needed-files/dhcpd.conf /etc/dhcp/dhcpd.conf
+cp pxe-build/needed-files/dhcpd.conf /etc/dhcp/dhcpd.conf
 
 
 #Build http
@@ -213,9 +213,9 @@ ln -s ../../pxelinux.cfg/default .
 cd /tftpboot/UEFI/pxelinux.cfg/
 ln -s ../../pxelinux.cfg/default .
 
-echo "#Make sure to change the IPs to the IP of your system." > /etc/dhcp/dhcpd.conf
+sed -i '1s/^/#Make sure to change the IPs to the IP of your system.\n/' /etc/dhcp/dhcpd.conf
 nano /etc/dhcp/dhcpd.conf
-echo "#Make sure to change the IPs to the IP of your system." > /tftpboot/pxelinux.cfg/default
+sed -i '1s/^/#Make sure to change the IPs to the IP of your system.\n/' /tftpboot/pxelinux.cfg/default
 nano /tftpboot/pxelinux.cfg/default
 
 #Restart needed services
@@ -224,9 +224,10 @@ systemctl restart apache*
 
 
 #Warning
-echo "Info: You will need to change the IP address to match your server within the kickstart files
-/tftpboot/kickstart/*"
+echo "Info: You will need to change the IP address to match your server within the kickstart files /tftpboot/kickstart/*"
+echo "Info: You will need to change the IP address to match your server within the kickstart files /tftpboot/kickstart/*" >> ~/Warning
 echo "Info: You will need to change the passwords (currently empty) within the /tftpboot/kickstart files"
+echo "Info: You will need to change the passwords (currently empty) within the /tftpboot/kickstart files" >> ~/Warning
 	exit 1
 
 elif [ $(ls /etc | grep redhat-release) = "redhat-release" ]; then
