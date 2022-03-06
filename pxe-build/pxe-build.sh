@@ -2,8 +2,17 @@
 ###TEST VERSION
 
 #Written by Edward Dembecki
-#Writted for Debian based ditributions
 #Must run as root
+
+#Dowloading syslinux
+echo 'Downloading syslinux'
+cd needed-files
+wget --no-check-certificate https://mirrors.edge.kernel.org/pub/linux/utils/boot/syslinux/Testing/6.03/syslinux-6.03-pre9.tar.gz
+
+#Unpacking syslinux
+echo 'Unpacking'
+tar -xvzf syslinux-6.03-pre9.tar.gz
+cd ..
 
 #Checking for needed files
 if [ $(ls needed-files | grep dhcpd.conf) = "dhcpd.conf" ] &&\
@@ -24,7 +33,7 @@ fi
 if [ $(whoami) = "root" ]; then
 	echo "Install running as root. Ok."
 else
-	echo "Install script needs to run as root. FAILED: Running as user  "
+	echo "Install script needs to run as root. FAILED: Running as user"
 	exit 1
 fi
 
