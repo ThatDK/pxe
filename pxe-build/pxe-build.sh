@@ -13,17 +13,19 @@ wget --no-check-certificate https://mirrors.edge.kernel.org/pub/linux/utils/boot
 echo 'Unpacking'
 tar -xvzf syslinux-6.03-pre9.tar.gz
 rm syslinux-6.03-pre9.tar.gz
-mv syslinux-6.03-pre9 syslinux-6.03
 cd ~
 
 #Checking for needed files
-if [ "$(ls pxe-build/needed-files | grep dhcpd.conf)" = "dhcpd.conf" ] &&\
-[ "$(ls pxe-build/needed-files | grep syslinux-6.03-pre9)" = "syslinux-6.03-pre9" ]; then
+if [ "$(ls /root/pxe-build/needed-files | grep dhcpd.conf)" = "dhcpd.conf" ] &&\
+[ "$(ls /root/pxe-build/needed-files | grep syslinux-6.03-pre9)" = "syslinux-6.03-pre9" ]; then
 	echo "Setup files found."
 else
 	echo "Failed to locate needed files."
         exit 1
 fi
+
+#renaming syslinux
+mv /root/pxe-build/needed-files/syslinux-6.03-pre9 /root/pxe-build/needed-files/syslinux-6.03
 
 #Checking install is run as root.
 if [ $(whoami) = "root" ]; then
@@ -44,8 +46,8 @@ fi
 #Checking distro
 if [ "$(ls /etc | grep debian_version)" = "debian_version" ]; then
 	echo "Debian distro detected."
-#Install tftpd
-apt-get install tftpd-hpa -y
+#Install tftpd/dhcp
+apt-get install tftpd-hpa isc-dhcp-server -y
 
 #Define tftp directory
 rm /etc/default/tftpd-hpa
@@ -55,6 +57,27 @@ TFTP_USERNAME="tftp"
 TFTP_DIRECTORY="/tftpboot"
 TFTP_ADDRESS="0.0.0.0:69"
 TFTP_OPTIONS="--secure"" >> /etc/default/tftpd-hpa
+
+elif [ $(ls /etc | grep redhat-release) = "redhat-release" ]; then
+echo "Be careful. This distro is currently under development"
+sleep 10s
+#Disable selinux if not already
+sed -i '7s/.*/SELINUX=disabled/' /etc/selinux/config
+
+#Install tftp server
+yum install tftp tftp-server -y
+
+#allow through firewalld
+firewall-cmd –zone=public –add-service=tftp –permanent
+firewall-cmd --reload
+
+#make directory for modified tftp files
+mkdir /etc/systemd/system/tftp
+cp /root/pxe-build/needed-files/rhel-specific/* /etc/systemd/system/tftp/
+else
+        echo "Unknown version. FAILED"
+        exit 1
+fi
 
 #Build directory structure
 mkdir /tftpboot
@@ -66,6 +89,9 @@ cd /tftpboot/kickstart
 mkdir centos7 debian9 debian10 debian11 freepbx
 mkdir /tftpboot/BIOS/pxelinux.cfg
 mkdir /tftpboot/UEFI/pxelinux.cfg
+
+#change permissions of tftp
+chmod 755 /tftpboot
 
 #Pull ISOs
 cd /tftpboot/distros/iso/
@@ -173,7 +199,7 @@ rm initrd.gz
 wget https://deb.debian.org/debian/dists/Debian9.13/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
 wget https://deb.debian.org/debian/dists/Debian9.13/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
 
-#Build preseeds
+#Move preseeds
 cd /root
 cp pxe-build/needed-files/debian9/preseed.cfg /tftpboot/kickstart/debian9
 cp pxe-build/needed-files/debian10/preseed.cfg /tftpboot/kickstart/debian10
@@ -181,11 +207,15 @@ cp pxe-build/needed-files/debian11/preseed.cfg /tftpboot/kickstart/debian11
 cp pxe-build/needed-files/centos7/ks.cfg /tftpboot/kickstart/centos7
 cp pxe-build/needed-files/freepbx/ks.cfg /tftpboot/kickstart/freepbx
 
-#Install DHCP server
-apt-get install isc-dhcp-server -y
+if [ "$(ls /etc | grep debian_version)" = "debian_version" ]; then
+#Configure DHCP server Debian
 cd /root
 cp pxe-build/needed-files/dhcpd.conf /etc/dhcp/dhcpd.conf
-
+elif [ $(ls /etc | grep redhat-release) = "redhat-release" ]; then
+#Configure DHCP server rhel
+else
+	exit 1
+fi
 
 #Build http
 apt-get install apache2 -y
@@ -205,26 +235,25 @@ nano /etc/dhcp/dhcpd.conf
 sed -i '1s/^/#Make sure to change the IPs to the IP of your system.\n/' /tftpboot/pxelinux.cfg/default
 nano /tftpboot/pxelinux.cfg/default
 
+if [ "$(ls /etc | grep debian_version)" = "debian_version" ]; then
 #Restart needed services
-systemctl restrt tftp-hpa.service
+systemctl restart tftp-hpa.service
 systemctl restart apache*
-
-
-#Info
-echo "Info: You will need to change the IP address to match your server within the kickstart files /tftpboot/kickstart/*"
-echo "Info: You will need to change the IP address to match your server within the kickstart files /tftpboot/kickstart/*" >> ~/pxe-info
-echo "Info: You will need to change the passwords (currently empty) within the /tftpboot/kickstart files"
-echo "Info: You will need to change the passwords (currently empty) within the /tftpboot/kickstart files" >> ~/pxe-info
-echo "Info: You will need to add users to the /tftpboot/kickstart files."
-echo "Info: You will need to add users to the /tftpboot/kickstart files." >> ~/pxe-nfo
-echo "Info: You will need to change IP addresses in /tftpboot/pxelinux.cfg/default file."
-echo "Info: You will need to change IP addresses in /tftpboot/pxelinux.cfg/default file." >> ~/pxe-info
-	exit 1
+exit 1
 
 elif [ $(ls /etc | grep redhat-release) = "redhat-release" ]; then
-	echo "Rhel distro detected. Temporary Failure while developing"
-	exit 1
+systemctl enable tftp-server
 else
-	echo "Unknown version. FAILED"
 	exit 1
 fi
+
+#Info
+#echo "Info: You will need to change the IP address to match your server within the kickstart files /tftpboot/kickstart/*"
+#echo "Info: You will need to change the IP address to match your server within the kickstart files /tftpboot/kickstart/*" >> ~/pxe-info
+#echo "Info: You will need to change the passwords (currently empty) within the /tftpboot/kickstart files"
+#echo "Info: You will need to change the passwords (currently empty) within the /tftpboot/kickstart files" >> ~/pxe-info
+#echo "Info: You will need to add users to the /tftpboot/kickstart files."
+#echo "Info: You will need to add users to the /tftpboot/kickstart files." >> ~/pxe-nfo
+#echo "Info: You will need to change IP addresses in /tftpboot/pxelinux.cfg/default file."
+#echo "Info: You will need to change IP addresses in /tftpboot/pxelinux.cfg/default file." >> ~/pxe-info
+exit 1
