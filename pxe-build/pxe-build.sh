@@ -13,6 +13,7 @@ wget --no-check-certificate https://mirrors.edge.kernel.org/pub/linux/utils/boot
 echo 'Unpacking'
 tar -xvzf syslinux-6.03-pre9.tar.gz
 rm syslinux-6.03-pre9.tar.gz
+mv syslinux-6.03-pre9 syslinux-6.03
 cd ~
 
 #Checking for needed files

@@ -1,10 +1,12 @@
 # pxe
 TO USE:
-1. Make sure you are the root user
-2. Copy pxe-build.tar.gz into /root directory
-3. Unpack using tar -xvzf pxe-build.tar.gz
-4. From /root directory, run pxe-build.sh
-5. Change IPs in the directories mentioned after the script ends
+1. wget https://github.com/ThatDK/pxe/blob/main/pxe-build.tar.gz?raw=true (or download pxe-build.tar.gz file directly)
+2. Rename file pxe-build.tar.gz
+3. Make sure you are the root user
+4. Copy pxe-build.tar.gz into /root directory
+5. Unpack using tar -xvzf pxe-build.tar.gz
+6. From /root directory, run pxe-build.sh
+7. Change IPs in the directories mentioned after the script ends
 
 The script was designed for Debian based distros. I have not written any for, or tried to write any for, other ditros yet.
 
