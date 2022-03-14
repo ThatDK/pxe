@@ -4,6 +4,14 @@
 #Written by Edward Dembecki
 #Must run as root
 
+#Checking directory
+if [ ${PWD} = "/root/pxe-build" ]; then
+	echo "Running from /root/pxe-build directory. Ok."
+else
+	echo "Must run from /root/pxe-build directory. FAILED."
+	exit 1
+fi
+
 #Dowloading syslinux
 echo 'Downloading syslinux'
 cd needed-files
@@ -11,12 +19,12 @@ wget --no-check-certificate https://mirrors.edge.kernel.org/pub/linux/utils/boot
 
 #Unpacking syslinux
 echo 'Unpacking'
-tar -xvzf syslinux-6.03-pre9.tar.gz
+tar -xvzf syslinux-6.03-pre9.tar.gz >> /dev/null
 rm syslinux-6.03-pre9.tar.gz
 cd ~
 
 #Checking for needed files
-if [ "$(ls /root/pxe-build/needed-files | grep dhcpd.conf)" = "dhcpd.conf" ] &&\
+if [ "$(ls /root/pxe-build/needed-files/debian | grep dhcpd.conf)" = "dhcpd.conf" ] &&\
 [ "$(ls /root/pxe-build/needed-files | grep syslinux-6.03-pre9)" = "syslinux-6.03-pre9" ]; then
 	echo "Setup files found."
 else
@@ -35,19 +43,11 @@ else
 	exit 1
 fi
 
-#Checking directory
-if [ ${PWD} = "/root" ]; then
-	echo "Running from /root directory. Ok."
-else
-	echo "Must run from /root directory. FAILED."
-	exit 1
-fi
-
 #Checking distro
 if [ "$(ls /etc | grep debian_version)" = "debian_version" ]; then
 	echo "Debian distro detected."
 #Install tftpd/dhcp
-apt-get install tftpd-hpa isc-dhcp-server -y
+apt-get install tftpd-hpa isc-dhcp-server apache2 -y
 
 #Define tftp directory
 rm /etc/default/tftpd-hpa
@@ -59,24 +59,22 @@ TFTP_ADDRESS="0.0.0.0:69"
 TFTP_OPTIONS="--secure"" >> /etc/default/tftpd-hpa
 
 elif [ $(ls /etc | grep redhat-release) = "redhat-release" ]; then
-echo "Be careful. This distro is currently under development"
+	echo "Be careful. This distro's version is currently under development, and therefore is incomplete."
 sleep 10s
 #Disable selinux if not already
 sed -i '7s/.*/SELINUX=disabled/' /etc/selinux/config
-
 #Install tftp server
-yum install tftp tftp-server -y
+yum install tftp tftp-server dhcp httpd -y
 
 #allow through firewalld
-firewall-cmd –zone=public –add-service=tftp –permanent
+firewall-cmd --zone=public --add-service=tftp --permanent
 firewall-cmd --reload
 
-#make directory for modified tftp files
-mkdir /etc/systemd/system/tftp
-cp /root/pxe-build/needed-files/rhel-specific/* /etc/systemd/system/tftp/
+#move modified tftp files
+cp /root/pxe-build/needed-files/rhel/tftp/* /usr/lib/systemd/system/
 else
-        echo "Unknown version. FAILED"
-        exit 1
+	echo "Unknown version. FAILED"
+	exit 1
 fi
 
 #Build directory structure
@@ -95,16 +93,16 @@ chmod 755 /tftpboot
 
 #Pull ISOs
 cd /tftpboot/distros/iso/
-wget http://mirrors.gigenet.com/centos/7.9.2009/isos/x86_64/CentOS-7-x86_64-DVD-2009.iso
-wget https://cdimage.debian.org/cdimage/archive/11.1.0/amd64/iso-dvd/debian-11.1.0-amd64-DVD-1.iso
-wget https://cdimage.debian.org/cdimage/archive/10.11.0/amd64/iso-dvd/debian-10.11.0-amd64-DVD-1.iso
-wget https://cdimage.debian.org/cdimage/archive/9.13.0/amd64/iso-dvd/debian-9.13.0-amd64-DVD-1.iso
-wget https://downloads.freepbxdistro.org/ISO/SNG7-PBX-64bit-2104-1.iso
+wget --no-check-certificate http://mirrors.gigenet.com/centos/7.9.2009/isos/x86_64/CentOS-7-x86_64-DVD-2009.iso
+wget --no-check-certificate https://cdimage.debian.org/cdimage/archive/11.1.0/amd64/iso-dvd/debian-11.1.0-amd64-DVD-1.iso
+wget --no-check-certificate https://cdimage.debian.org/cdimage/archive/10.11.0/amd64/iso-dvd/debian-10.11.0-amd64-DVD-1.iso
+wget --no-check-certificate https://cdimage.debian.org/cdimage/archive/9.13.0/amd64/iso-dvd/debian-9.13.0-amd64-DVD-1.iso
+wget --no-check-certificate https://downloads.freepbxdistro.org/ISO/SNG7-PBX-64bit-2104-1.iso
 
 #Build BIOS/UEFI menu structures
 cp /root/pxe-build/needed-files/syslinux-6.03/bios/com32/menu/menu.c32 /tftpboot/BIOS
 cp /root/pxe-build/needed-files/syslinux-6.03/bios/core/pxelinux.0 /tftpboot/BIOS
-cp /root/needed-files/syslinux-6.03/bios/com32/libutil/libutil.c32 /tftpboot/BIOS
+cp /root/pxe-build/needed-files/syslinux-6.03/bios/com32/libutil/libutil.c32 /tftpboot/BIOS
 cp /root/pxe-build/needed-files/syslinux-6.03/bios/com32/elflink/ldlinux/ldlinux.c32 /tftpboot/BIOS
 cp /root/pxe-build/needed-files/syslinux-6.03/efi64/com32/elflink/ldlinux/ldlinux.e64 /tftpboot/UEFI
 cp /root/pxe-build/needed-files/syslinux-6.03/efi64/com32/libutil/libutil.c32 /tftpboot/UEFI
@@ -186,18 +184,18 @@ umount /mnt
 #Download debian kernel/initrd
 cd /tftpboot/distros/debian11/install.amd/
 rm initrd.gz
-wget https://deb.debian.org/debian/dists/Debian11.2/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
-wget https://deb.debian.org/debian/dists/Debian11.2/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
+wget --no-check-certificate https://deb.debian.org/debian/dists/Debian11.2/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
+wget --no-check-certificate https://deb.debian.org/debian/dists/Debian11.2/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
 
-cd /tftpboot/distros/debian10/install.amd
+cd /tftpboot/distros/debian10/install.amd/
 rm initrd.gz
-wget https://deb.debian.org/debian/dists/Debian10.11/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
-wget https://deb.debian.org/debian/dists/Debian10.11/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
+wget --no-check-certificate https://deb.debian.org/debian/dists/Debian10.11/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
+wget --no-check-certificate https://deb.debian.org/debian/dists/Debian10.11/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
 
-cd /tftpboot/distros/debian9/install.amd
+cd /tftpboot/distros/debian9/install.amd/
 rm initrd.gz
-wget https://deb.debian.org/debian/dists/Debian9.13/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
-wget https://deb.debian.org/debian/dists/Debian9.13/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
+wget --no-check-certificate https://deb.debian.org/debian/dists/Debian9.13/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
+wget --no-check-certificate https://deb.debian.org/debian/dists/Debian9.13/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
 
 #Move preseeds
 cd /root
@@ -208,17 +206,16 @@ cp pxe-build/needed-files/centos7/ks.cfg /tftpboot/kickstart/centos7
 cp pxe-build/needed-files/freepbx/ks.cfg /tftpboot/kickstart/freepbx
 
 if [ "$(ls /etc | grep debian_version)" = "debian_version" ]; then
-#Configure DHCP server Debian
+	#Configure DHCP server Debian
 cd /root
-cp pxe-build/needed-files/dhcpd.conf /etc/dhcp/dhcpd.conf
+cp pxe-build/needed-files/debian/dhcpd.conf /etc/dhcp/dhcpd.conf
 elif [ $(ls /etc | grep redhat-release) = "redhat-release" ]; then
-#Configure DHCP server rhel
+	#Configure DHCP server rhel
+cd /root
+cp pxe-build/needed-files/rhel/dhcp/dhcpd.conf /etc/dhcp/dhcpd.conf
 else
 	exit 1
 fi
-
-#Build http
-apt-get install apache2 -y
 
 #Create links
 cd /var/www/html
@@ -235,14 +232,18 @@ nano /etc/dhcp/dhcpd.conf
 sed -i '1s/^/#Make sure to change the IPs to the IP of your system.\n/' /tftpboot/pxelinux.cfg/default
 nano /tftpboot/pxelinux.cfg/default
 
-if [ "$(ls /etc | grep debian_version)" = "debian_version" ]; then
 #Restart needed services
-systemctl restart tftp-hpa.service
+if [ "$(ls /etc | grep debian_version)" = "debian_version" ]; then
+	systemctl restart tftp-hpa.service
+systemctl enable tftp-hpa
 systemctl restart apache*
-exit 1
+systemctl enable apache*
 
 elif [ $(ls /etc | grep redhat-release) = "redhat-release" ]; then
-systemctl enable tftp-server
+	systemctl enable tftp-server
+systemctl start tftp-server
+systemctl enable dhcpd
+systemctl start dhcpd
 else
 	exit 1
 fi
