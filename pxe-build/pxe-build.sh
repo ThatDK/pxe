@@ -4,6 +4,10 @@
 #Written by Edward Dembecki
 #Must run as root
 
+#Code to be tested later
+#ip a | grep inet | tail -n 2 | head -n 1 > file.txt && grep -E -o\
+# '((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)' file.txt | head -n 1
+
 #Checking directory
 if [ ${PWD} = "/root/pxe-build" ]; then
 	echo "Running from /root/pxe-build directory. Ok."
