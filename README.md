@@ -1,6 +1,6 @@
 # pxe
 TO USE:
-1. wget https://github.com/ThatDK/pxe/blob/main/pxe-build.tar.gz?raw=true (or download pxe-build.tar.gz file directly)
+1. wget https://raw.githubusercontent.com/ThatDK/pxe/main/pxe-build.tar.gz (or download pxe-build.tar.gz file directly)
 2. Rename file pxe-build.tar.gz
 3. Make sure you are the root user
 4. Copy pxe-build.tar.gz into /root directory
