@@ -10,7 +10,7 @@
 
 ##Setting variables
 #path running from
-a=$(${PWD})
+a=${PWD}
 #netmask
 b=$(ip a | grep $(hostname -I | cut -d " " -f1) | cut -d "/" -f2 | cut -d " " -f1)
 #subnet
@@ -110,18 +110,19 @@ apt-get install tftpd-hpa isc-dhcp-server apache2 -y
 
 #Define tftp directory
 rm /etc/default/tftpd-hpa
-echo "# /etc/default/tftpd-hpa
+echo '# /etc/default/tftpd-hpa
 
 TFTP_USERNAME="tftp"
 TFTP_DIRECTORY="/tftpboot"
 TFTP_ADDRESS="0.0.0.0:69"
-TFTP_OPTIONS="--secure"" >> /etc/default/tftpd-hpa
+TFTP_OPTIONS="--secure"' >> /etc/default/tftpd-hpa
 
 elif [ $(ls /etc | grep redhat-release) = "redhat-release" ]; then
 	echo "Be careful. This distro's version is currently under development, and therefore is incomplete."
 sleep 10s
 #Disable selinux if not already
 sed -i '7s/.*/SELINUX=disabled/' /etc/selinux/config
+
 #Install tftp server
 yum install tftp tftp-server dhcp httpd -y
 
