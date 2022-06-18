@@ -32,7 +32,7 @@ fi
 #path running from
 a=${PWD}
 #netmask
-b=$(ip a | grep $(hostname -i | cut -d " " -f1) | cut -d "/" -f2 | cut -d " " -f1)
+b=$(ip a | grep $(hostname -I | cut -d " " -f1) | cut -d "/" -f2 | cut -d " " -f1)
 #subnet
 c=$(hostname -I | cut -d " " -f1 | cut -d "." -f1-3)
 #IP
