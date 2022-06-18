@@ -297,7 +297,7 @@ sed -i '1s/^/#Make sure to change the IPs to the IP of your system.\n/' /tftpboo
 nano /tftpboot/pxelinux.cfg/default
 
 #Restart needed services
-if [ "$(ls /etc | grep debian_version)" = "debian_version" ]; then
+if [ $(ls /etc | grep debian_version) = "debian_version" ]; then
 	systemctl restart tftp-hpa.service
 	systemctl enable tftp-hpa
 	systemctl restart apache*
