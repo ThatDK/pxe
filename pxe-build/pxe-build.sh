@@ -8,8 +8,17 @@
 #ip a | grep inet | tail -n 2 | head -n 1 > file.txt && grep -E -o\
 # '((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)' file.txt | head -n 1
 
-#Disclaimers
-
+##Setting variables
+#path running from
+a=$(${PWD})
+#netmask
+b=$(ip a | grep $(hostname -I | cut -d " " -f1) | cut -d "/" -f2 | cut -d " " -f1)
+#subnet
+c=$(hostname -I | cut -d " " -f1 | cut -d "." -f1-3)
+#IP
+d=$(hostname -I | cut -d " " -f1)
+#interface
+f=$(ip a | grep BROADCAST,MULTICAST,UP | grep -v DOWN | grep -v NO-CARRIER | cut -d " " -f2 | cut -d ":" -f1 | head -n 1)
 
 #Checking directory
 #if [ ${PWD} = "/root/pxe-build" ]; then
@@ -35,18 +44,6 @@ else
 	echo "Install needs root permissions. FAILED: Running as user"
 	exit 1
 fi
-
-##Setting variables
-#path running from
-a=${PWD}
-#netmask
-b=$(ip a | grep $(hostname -I | cut -d " " -f1) | cut -d "/" -f2 | cut -d " " -f1)
-#subnet
-c=$(hostname -I | cut -d " " -f1 | cut -d "." -f1-3)
-#IP
-d=$(hostname -I | cut -d " " -f1)
-#interface
-f=$(ip a | grep BROADCAST,MULTICAST,UP | grep -v DOWN | grep -v NO-CARRIER | cut -d " " -f2 | cut -d ":" -f1 | head -n 1)
 
 if [ "$b" = "1" ]; then b=128.0.0.0;
 elif [ "$b" = "2" ]; then b=192.0.0.0;
