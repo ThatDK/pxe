@@ -7,10 +7,10 @@
 #Code to be tested later
 #ip a | grep inet | tail -n 2 | head -n 1 > file.txt && grep -E -o\
 # '((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)' file.txt | head -n 1
-export PATH="$PATH:${PWD}"
+
 ##Setting variables
 #path running from
-#a=$(echo ${PWD})
+a="${PWD}"
 #netmask
 b=$(ip a | grep $(hostname -I | cut -d " " -f1) | cut -d "/" -f2 | cut -d " " -f1)
 #subnet
