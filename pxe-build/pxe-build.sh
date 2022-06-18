@@ -37,7 +37,8 @@ b=$(ip a | grep $(hostname -I | cut -d " " -f1) | cut -d "/" -f2 | cut -d " " -f
 c=$(hostname -I | cut -d " " -f1 | cut -d "." -f1-3)
 #IP
 d=$(hostname -I | cut -d " " -f1)
-
+#interface
+f=$(ip a | grep BROADCAST,MULTICAST,UP | grep -v DOWN | grep -v NO-CARRIER | cut -d " " -f2 | cut -d ":" -f1 | head -n 1)
 
 if [ "$b" = "1" ]; then b=128.0.0.0;
 elif [ "$b" = "2" ]; then b=192.0.0.0;
@@ -279,6 +280,7 @@ fi
 sed -i "s/NETMASK/$b/g" /etc/dhcp/dhcpd.conf
 sed -i "s/SUBNET/$c/g" /etc/dhcp/dhcpd.conf
 sed -i "s/IP ADDRESS/$d/g" /etc/dhcp/dhcpd.conf
+sed -i "s/INTERFACESv4=""/INTERFACESv4=$f/g" /etc/default/isc-dhcp-server && sed -i 's/""//g' /etc/default/isc-dhcp-server
 
 #Create links
 cd /var/www/html
@@ -298,15 +300,15 @@ nano /tftpboot/pxelinux.cfg/default
 #Restart needed services
 if [ "$(ls /etc | grep debian_version)" = "debian_version" ]; then
 	systemctl restart tftp-hpa.service
-systemctl enable tftp-hpa
-systemctl restart apache*
-systemctl enable apache*
+	systemctl enable tftp-hpa
+	systemctl restart apache*
+	systemctl enable apache*
 
 elif [ $(ls /etc | grep redhat-release) = "redhat-release" ]; then
 	systemctl enable tftp-server
-systemctl start tftp-server
-systemctl enable dhcpd
-systemctl start dhcpd
+	systemctl start tftp-server
+	systemctl enable dhcpd
+	systemctl start dhcpd
 else
 	exit 1
 fi
