@@ -7,10 +7,10 @@
 #Code to be tested later
 #ip a | grep inet | tail -n 2 | head -n 1 > file.txt && grep -E -o\
 # '((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)' file.txt | head -n 1
-
+export PATH="$PATH:${PWD}"
 ##Setting variables
 #path running from
-a=$(echo ${PWD})
+#a=$(echo ${PWD})
 #netmask
 b=$(ip a | grep $(hostname -I | cut -d " " -f1) | cut -d "/" -f2 | cut -d " " -f1)
 #subnet
@@ -82,7 +82,7 @@ fi
 
 #Dowloading syslinux
 echo 'Downloading syslinux'
-wget --no-check-certificate https://mirrors.edge.kernel.org/pub/linux/utils/boot/syslinux/Testing/6.03/syslinux-6.03-pre9.tar.gz -O $a/needed-files/
+wget --no-check-certificate https://mirrors.edge.kernel.org/pub/linux/utils/boot/syslinux/Testing/6.03/syslinux-6.03-pre9.tar.gz -O $PATH/needed-files/
 
 #Unpacking syslinux
 echo 'Unpacking'
@@ -90,8 +90,8 @@ tar -xvzf syslinux-6.03-pre9.tar.gz >> /dev/null
 rm syslinux-6.03-pre9.tar.gz
 
 #Checking for needed files
-if [ "$(ls $a/needed-files/debian | grep dhcpd.conf)" = "dhcpd.conf" ] &&\
-[ "$(ls $a/needed-files | grep syslinux-6.03-pre9)" = "syslinux-6.03-pre9" ]; then
+if [ "$(ls $PATH/needed-files/debian | grep dhcpd.conf)" = "dhcpd.conf" ] &&\
+[ "$(ls $PATH/needed-files | grep syslinux-6.03-pre9)" = "syslinux-6.03-pre9" ]; then
 	echo "Setup files found."
 else
 	echo "Failed to locate needed files."
@@ -99,7 +99,7 @@ else
 fi
 
 #renaming syslinux
-mv $a/needed-files/syslinux-6.03-pre9 $a/needed-files/syslinux-6.03
+mv $PATH/needed-files/syslinux-6.03-pre9 $PATH/needed-files/syslinux-6.03
 
 #Checking distro
 if [ "$(ls /etc | grep debian_version)" = "debian_version" ]; then
@@ -131,7 +131,7 @@ firewall-cmd --zone=public --add-service=tftp --permanent
 firewall-cmd --reload
 
 #move modified tftp files
-cp $a/needed-files/rhel/tftp/* /usr/lib/systemd/system/
+cp $PATH/needed-files/rhel/tftp/* /usr/lib/systemd/system/
 else
 	echo "Unknown version. FAILED"
 	exit 1
@@ -139,10 +139,10 @@ fi
 
 if [ "$(ls /etc | grep debian_version)" = "debian_version" ]; then
 	#Configure DHCP server Debian
-	cp $a/needed-files/debian/dhcpd.conf /etc/dhcp/dhcpd.conf
+	cp $PATH/needed-files/debian/dhcpd.conf /etc/dhcp/dhcpd.conf
 elif [ $(ls /etc | grep redhat-release) = "redhat-release" ]; then
 	#Configure DHCP server rhel
-	cp $a/needed-files/rhel/dhcp/dhcpd.conf /etc/dhcp/dhcpd.conf
+	cp $PATH/needed-files/rhel/dhcp/dhcpd.conf /etc/dhcp/dhcpd.conf
 else
 	exit 1
 fi
@@ -175,14 +175,14 @@ wget --no-check-certificate https://cdimage.debian.org/cdimage/archive/9.13.0/am
 wget --no-check-certificate https://downloads.freepbxdistro.org/ISO/SNG7-PBX-64bit-2104-1.iso
 
 #Build BIOS/UEFI menu structures
-cp $a/needed-files/syslinux-6.03/bios/com32/menu/menu.c32 /tftpboot/BIOS
-cp $a/needed-files/syslinux-6.03/bios/core/pxelinux.0 /tftpboot/BIOS
-cp $a/needed-files/syslinux-6.03/bios/com32/libutil/libutil.c32 /tftpboot/BIOS
-cp $a/needed-files/syslinux-6.03/bios/com32/elflink/ldlinux/ldlinux.c32 /tftpboot/BIOS
-cp $a/needed-files/syslinux-6.03/efi64/com32/elflink/ldlinux/ldlinux.e64 /tftpboot/UEFI
-cp $a/needed-files/syslinux-6.03/efi64/com32/libutil/libutil.c32 /tftpboot/UEFI
-cp $a/needed-files/syslinux-6.03/efi64/com32/menu/menu.c32 /tftpboot/UEFI
-cp $a/needed-files/syslinux-6.03/efi64/efi/syslinux.efi /tftpboot/UEFI
+cp $PATH/needed-files/syslinux-6.03/bios/com32/menu/menu.c32 /tftpboot/BIOS
+cp $PATH/needed-files/syslinux-6.03/bios/core/pxelinux.0 /tftpboot/BIOS
+cp $PATH/needed-files/syslinux-6.03/bios/com32/libutil/libutil.c32 /tftpboot/BIOS
+cp $PATH/needed-files/syslinux-6.03/bios/com32/elflink/ldlinux/ldlinux.c32 /tftpboot/BIOS
+cp $PATH/needed-files/syslinux-6.03/efi64/com32/elflink/ldlinux/ldlinux.e64 /tftpboot/UEFI
+cp $PATH/needed-files/syslinux-6.03/efi64/com32/libutil/libutil.c32 /tftpboot/UEFI
+cp $PATH/needed-files/syslinux-6.03/efi64/com32/menu/menu.c32 /tftpboot/UEFI
+cp $PATH/needed-files/syslinux-6.03/efi64/efi/syslinux.efi /tftpboot/UEFI
 
 #PXE menu contents
 echo "#PXE script written by Edward Dembecki
@@ -273,11 +273,11 @@ wget --no-check-certificate https://deb.debian.org/debian/dists/Debian9.13/main/
 wget --no-check-certificate https://deb.debian.org/debian/dists/Debian9.13/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
 
 #Move preseeds
-cp $a/needed-files/debian9/preseed.cfg /tftpboot/kickstart/debian9
-cp $a/needed-files/debian10/preseed.cfg /tftpboot/kickstart/debian10
-cp $a/needed-files/debian11/preseed.cfg /tftpboot/kickstart/debian11
-cp $a/needed-files/centos7/ks.cfg /tftpboot/kickstart/centos7
-cp $a/needed-files/freepbx/ks.cfg /tftpboot/kickstart/freepbx
+cp $PATH/needed-files/debian9/preseed.cfg /tftpboot/kickstart/debian9
+cp $PATH/needed-files/debian10/preseed.cfg /tftpboot/kickstart/debian10
+cp $PATH/needed-files/debian11/preseed.cfg /tftpboot/kickstart/debian11
+cp $PATH/needed-files/centos7/ks.cfg /tftpboot/kickstart/centos7
+cp $PATH/needed-files/freepbx/ks.cfg /tftpboot/kickstart/freepbx
 
 #Create links
 cd /var/www/html
