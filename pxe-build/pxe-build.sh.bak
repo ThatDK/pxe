@@ -8,68 +8,12 @@
 #ip a | grep inet | tail -n 2 | head -n 1 > file.txt && grep -E -o\
 # '((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)' file.txt | head -n 1
 
-#Disclaimers
-
-
 #Checking directory
-#if [ ${PWD} = "/root/pxe-build" ]; then
-#	echo "Running from /root/pxe-build directory. Ok."
-#else
-#	echo "Must run from /root/pxe-build directory. FAILED."
-#	exit 1
-#fi
-
-#confirmation
-echo "This script installs a TFTP server, DHCP server, and downloads several ISO files. Be careful when running this script if you already have a DHCP server running."
-read -r -p "Do you still wish to run this script? (y/n) " e
-if [ -z $d ] || [ n = $d ]
+if [ ${PWD} = "/root/pxe-build" ]; then
+	echo "Running from /root/pxe-build directory. Ok."
+else
+	echo "Must run from /root/pxe-build directory. FAILED."
 	exit 1
-fi
-
-##Setting variables
-#path running from
-a=${PWD}
-#netmask
-b=$(ip a | grep $(hostname -i | cut -d " " -f1) | cut -d "/" -f2 | cut -d " " -f1)
-#subnet
-c=$(hostname -I | cut -d " " -f1 | cut -d "." -f1-3)
-#IP
-d=$(hostname -I | cut -d " " -f1)
-
-
-if [ $b = "1" ]; then b=128.0.0.0;
-elif [ $b = "2" ]; then b=192.0.0.0;
-elif [ $b = "3" ]; then b=224.0.0.0;
-elif [ $b = "4" ]; then b=240.0.0.0;
-elif [ $b = "5" ]; then b=248.0.0.0;
-elif [ $b = "6" ]; then b=252.0.0.0;
-elif [ $b = "7" ]; then b=254.0.0.0;
-elif [ $b = "8" ]; then b=255.0.0.0;
-elif [ $b = "9" ]; then b=255.128.0.0;
-elif [ $b = "10" ]; then b=255.192.0.0;
-elif [ $b = "11" ]; then b=255.224.0.0;
-elif [ $b = "12" ]; then b=255.240.0.0;
-elif [ $b = "13" ]; then b=255.248.0.0;
-elif [ $b = "14" ]; then b=255.252.0.0;
-elif [ $b = "15" ]; then b=255.254.0.0;
-elif [ $b = "16" ]; then b=255.255.0.0;
-elif [ $b = "17" ]; then b=255.255.128.0;
-elif [ $b = "18" ]; then b=255.255.192.0;
-elif [ $b = "19" ]; then b=255.255.224.0;
-elif [ $b = "20" ]; then b=255.255.240.0;
-elif [ $b = "21" ]; then b=255.255.248.0;
-elif [ $b = "22" ]; then b=255.255.252.0;
-elif [ $b = "23" ]; then b=255.255.254.0;
-elif [ $b = "24" ]; then b=255.255.255.0;
-elif [ $b = "25" ]; then b=255.255.255.128;
-elif [ $b = "26" ]; then b=255.255.255.192;
-elif [ $b = "27" ]; then b=255.255.255.224;
-elif [ $b = "28" ]; then b=255.255.255.240;
-elif [ $b = "29" ]; then b=255.255.255.248;
-elif [ $b = "30" ]; then b=255.255.255.252;
-elif [ $b = "31" ]; then b=255.255.255.254;
-elif [ $b = "32" ]; then b=255.255.255.255;
-else echo "Invalid CIDR Notation"; exit 1;
 fi
 
 #Dowloading syslinux
@@ -84,8 +28,8 @@ rm syslinux-6.03-pre9.tar.gz
 cd ~
 
 #Checking for needed files
-if [ "$(ls $a/needed-files/debian | grep dhcpd.conf)" = "dhcpd.conf" ] &&\
-[ "$(ls $a/needed-files | grep syslinux-6.03-pre9)" = "syslinux-6.03-pre9" ]; then
+if [ "$(ls /root/pxe-build/needed-files/debian | grep dhcpd.conf)" = "dhcpd.conf" ] &&\
+[ "$(ls /root/pxe-build/needed-files | grep syslinux-6.03-pre9)" = "syslinux-6.03-pre9" ]; then
 	echo "Setup files found."
 else
 	echo "Failed to locate needed files."
@@ -93,13 +37,13 @@ else
 fi
 
 #renaming syslinux
-mv $a/needed-files/syslinux-6.03-pre9 $a/needed-files/syslinux-6.03
+mv /root/pxe-build/needed-files/syslinux-6.03-pre9 /root/pxe-build/needed-files/syslinux-6.03
 
 #Checking install is run as root.
 if [ $(whoami) = "root" ]; then
 	echo "Install running as root. Ok."
 else
-	echo "Install needs root permissions. FAILED: Running as user"
+	echo "Install script needs to run as root. FAILED: Running as user"
 	exit 1
 fi
 
@@ -131,7 +75,7 @@ firewall-cmd --zone=public --add-service=tftp --permanent
 firewall-cmd --reload
 
 #move modified tftp files
-cp $a/needed-files/rhel/tftp/* /usr/lib/systemd/system/
+cp /root/pxe-build/needed-files/rhel/tftp/* /usr/lib/systemd/system/
 else
 	echo "Unknown version. FAILED"
 	exit 1
@@ -160,14 +104,14 @@ wget --no-check-certificate https://cdimage.debian.org/cdimage/archive/9.13.0/am
 wget --no-check-certificate https://downloads.freepbxdistro.org/ISO/SNG7-PBX-64bit-2104-1.iso
 
 #Build BIOS/UEFI menu structures
-cp $a/needed-files/syslinux-6.03/bios/com32/menu/menu.c32 /tftpboot/BIOS
-cp $a/needed-files/syslinux-6.03/bios/core/pxelinux.0 /tftpboot/BIOS
-cp $a/needed-files/syslinux-6.03/bios/com32/libutil/libutil.c32 /tftpboot/BIOS
-cp $a/needed-files/syslinux-6.03/bios/com32/elflink/ldlinux/ldlinux.c32 /tftpboot/BIOS
-cp $a/needed-files/syslinux-6.03/efi64/com32/elflink/ldlinux/ldlinux.e64 /tftpboot/UEFI
-cp $a/needed-files/syslinux-6.03/efi64/com32/libutil/libutil.c32 /tftpboot/UEFI
-cp $a/needed-files/syslinux-6.03/efi64/com32/menu/menu.c32 /tftpboot/UEFI
-cp $a/needed-files/syslinux-6.03/efi64/efi/syslinux.efi /tftpboot/UEFI
+cp /root/pxe-build/needed-files/syslinux-6.03/bios/com32/menu/menu.c32 /tftpboot/BIOS
+cp /root/pxe-build/needed-files/syslinux-6.03/bios/core/pxelinux.0 /tftpboot/BIOS
+cp /root/pxe-build/needed-files/syslinux-6.03/bios/com32/libutil/libutil.c32 /tftpboot/BIOS
+cp /root/pxe-build/needed-files/syslinux-6.03/bios/com32/elflink/ldlinux/ldlinux.c32 /tftpboot/BIOS
+cp /root/pxe-build/needed-files/syslinux-6.03/efi64/com32/elflink/ldlinux/ldlinux.e64 /tftpboot/UEFI
+cp /root/pxe-build/needed-files/syslinux-6.03/efi64/com32/libutil/libutil.c32 /tftpboot/UEFI
+cp /root/pxe-build/needed-files/syslinux-6.03/efi64/com32/menu/menu.c32 /tftpboot/UEFI
+cp /root/pxe-build/needed-files/syslinux-6.03/efi64/efi/syslinux.efi /tftpboot/UEFI
 
 #PXE menu contents
 echo "#PXE script written by Edward Dembecki
@@ -181,46 +125,46 @@ MENU TITLE PXE Menu
 LABEL Debian11
 	TEXT HELP Seeded Installer
 	ENDTEXT
-	kernel tftp://$d/distros/debian11/install.amd/linux
-	initrd tftp://$d/distros/debian11/install.amd/initrd.gz
+	kernel tftp://192.168.3.3/distros/debian11/install.amd/linux
+	initrd tftp://192.168.3.3/distros/debian11/install.amd/initrd.gz
 	append vga=normal priority=high
-#auto=true auto url=tftp://$d/kickstart/debian11/preseed.cfg
+#auto=true auto url=tftp://192.168.3.3/kickstart/debian11/preseed.cfg
 
 LABEL Debian10
 	TEXT HELP Seeded Installer
 	ENDTEXT
-	kernel tftp://$d/distros/debian10/install.amd/linux
-	initrd tftp://$d/distros/debian10/install.amd/initrd.gz
+	kernel tftp://192.168.3.3/distros/debian10/install.amd/linux
+	initrd tftp://192.168.3.3/distros/debian10/install.amd/initrd.gz
 	append vga=normal priority=high
-#auto=true auto url=tftp://$d/kickstart/debian10/preseed.cfg
+#auto=true auto url=tftp://192.168.3.3/kickstart/debian10/preseed.cfg
 
 LABEL Debian9
 	TEXT HELP Seeded Installer
 	ENDTEXT
-	kernel tftp://$d/distros/debian9/install.amd/linux
-	initrd tftp://$d/distros/debian9/install.amd/initrd.gz
+	kernel tftp://192.168.3.3/distros/debian9/install.amd/linux
+	initrd tftp://192.168.3.3/distros/debian9/install.amd/initrd.gz
 	append vga=normal priority=high
-#auto=true auto url=tftp://$d/kickstart/debian9/preseed.cfg
+#auto=true auto url=tftp://192.168.3.3/kickstart/debian9/preseed.cfg
 
 MENU SEPARATOR
 
 LABEL CentOS7
 	TEXT HELP Seeded Installer
 	ENDTEXT
-	kernel tftp://$d/distros/centos7/images/pxeboot/vmlinuz
-	initrd tftp://$d/distros/centos7/images/pxeboot/initrd.img
-	append vga=normal priority=high method=http://$d/distros/centos7/
-#ks=http://$d/kickstart/centos7/ks.cfg
+	kernel tftp://192.168.3.3/distros/centos7/images/pxeboot/vmlinuz
+	initrd tftp://192.168.3.3/distros/centos7/images/pxeboot/initrd.img
+	append vga=normal priority=high method=http://192.168.3.3/distros/centos7/
+#ks=http://192.168.3.3/kickstart/centos7/ks.cfg
 
 MENU SEPARATOR
 
 LABEL FreePBX
 	TEXT HELP Unseeded Installer
 	ENDTEXT
-	kernel tftp://$d/distros/freepbx/images/pxeboot/vmlinuz
-	initrd tftp://$d/distros/freepbx/images/pxeboot/initrd.img
-	append vga=normal priority=high method=http://$d/distros/freepbx/
-#ks=http://$d/kickstart/freepbx/ks.cfg" >> /tftpboot/pxelinux.cfg/default
+	kernel tftp://192.168.3.3/distros/freepbx/images/pxeboot/vmlinuz
+	initrd tftp://192.168.3.3/distros/freepbx/images/pxeboot/initrd.img
+	append vga=normal priority=high method=http://192.168.3.3/distros/freepbx/
+#ks=http://192.168.3.3/kickstart/freepbx/ks.cfg" >> /tftpboot/pxelinux.cfg/default
 
 #Unpack ISOs
 cd /tftpboot/distros/iso
@@ -258,25 +202,24 @@ wget --no-check-certificate https://deb.debian.org/debian/dists/Debian9.13/main/
 wget --no-check-certificate https://deb.debian.org/debian/dists/Debian9.13/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
 
 #Move preseeds
-cp $a/needed-files/debian9/preseed.cfg /tftpboot/kickstart/debian9
-cp $a/needed-files/debian10/preseed.cfg /tftpboot/kickstart/debian10
-cp $a/needed-files/debian11/preseed.cfg /tftpboot/kickstart/debian11
-cp $a/needed-files/centos7/ks.cfg /tftpboot/kickstart/centos7
-cp $a/needed-files/freepbx/ks.cfg /tftpboot/kickstart/freepbx
+cd /root
+cp pxe-build/needed-files/debian9/preseed.cfg /tftpboot/kickstart/debian9
+cp pxe-build/needed-files/debian10/preseed.cfg /tftpboot/kickstart/debian10
+cp pxe-build/needed-files/debian11/preseed.cfg /tftpboot/kickstart/debian11
+cp pxe-build/needed-files/centos7/ks.cfg /tftpboot/kickstart/centos7
+cp pxe-build/needed-files/freepbx/ks.cfg /tftpboot/kickstart/freepbx
 
 if [ "$(ls /etc | grep debian_version)" = "debian_version" ]; then
 	#Configure DHCP server Debian
-	cp $a/needed-files/debian/dhcpd.conf /etc/dhcp/dhcpd.conf
+cd /root
+cp pxe-build/needed-files/debian/dhcpd.conf /etc/dhcp/dhcpd.conf
 elif [ $(ls /etc | grep redhat-release) = "redhat-release" ]; then
 	#Configure DHCP server rhel
-	cp $a/needed-files/rhel/dhcp/dhcpd.conf /etc/dhcp/dhcpd.conf
+cd /root
+cp pxe-build/needed-files/rhel/dhcp/dhcpd.conf /etc/dhcp/dhcpd.conf
 else
 	exit 1
 fi
-
-sed -i "s/NETMASK/$b/g" /etc/dhcp/dhcpd.conf
-sed -i "s/SUBNET/$c/g" /etc/dhcp/dhcpd.conf
-sed -i "s/IP ADDRESS/$d/g" /etc/dhcp/dhcpd.conf
 
 #Create links
 cd /var/www/html
@@ -310,4 +253,12 @@ else
 fi
 
 #Info
-echo "Info: Kickstart files are disabled by default. Add users and hashed passwords to /tftpboot/kickstart files."
+#echo "Info: You will need to change the IP address to match your server within the kickstart files /tftpboot/kickstart/*"
+#echo "Info: You will need to change the IP address to match your server within the kickstart files /tftpboot/kickstart/*" >> ~/pxe-info
+#echo "Info: You will need to change the passwords (currently empty) within the /tftpboot/kickstart files"
+#echo "Info: You will need to change the passwords (currently empty) within the /tftpboot/kickstart files" >> ~/pxe-info
+#echo "Info: You will need to add users to the /tftpboot/kickstart files."
+#echo "Info: You will need to add users to the /tftpboot/kickstart files." >> ~/pxe-nfo
+#echo "Info: You will need to change IP addresses in /tftpboot/pxelinux.cfg/default file."
+#echo "Info: You will need to change IP addresses in /tftpboot/pxelinux.cfg/default file." >> ~/pxe-info
+exit 1
