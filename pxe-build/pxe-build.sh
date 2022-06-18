@@ -10,7 +10,7 @@
 
 ##Setting variables
 #path running from
-a=${PWD}
+a=$(${PWD})
 #netmask
 b=$(ip a | grep $(hostname -I | cut -d " " -f1) | cut -d "/" -f2 | cut -d " " -f1)
 #subnet
