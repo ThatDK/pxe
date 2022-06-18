@@ -28,6 +28,14 @@ then
 	exit 1
 fi
 
+#Checking install is run as root.
+if [ $(whoami) = "root" ]; then
+	echo "Install running as root. Ok."
+else
+	echo "Install needs root permissions. FAILED: Running as user"
+	exit 1
+fi
+
 ##Setting variables
 #path running from
 a=${PWD}
@@ -77,14 +85,12 @@ fi
 
 #Dowloading syslinux
 echo 'Downloading syslinux'
-cd needed-files
-wget --no-check-certificate https://mirrors.edge.kernel.org/pub/linux/utils/boot/syslinux/Testing/6.03/syslinux-6.03-pre9.tar.gz
+wget --no-check-certificate https://mirrors.edge.kernel.org/pub/linux/utils/boot/syslinux/Testing/6.03/syslinux-6.03-pre9.tar.gz -O $a/needed-files/
 
 #Unpacking syslinux
 echo 'Unpacking'
 tar -xvzf syslinux-6.03-pre9.tar.gz >> /dev/null
 rm syslinux-6.03-pre9.tar.gz
-cd ~
 
 #Checking for needed files
 if [ "$(ls $a/needed-files/debian | grep dhcpd.conf)" = "dhcpd.conf" ] &&\
@@ -98,19 +104,12 @@ fi
 #renaming syslinux
 mv $a/needed-files/syslinux-6.03-pre9 $a/needed-files/syslinux-6.03
 
-#Checking install is run as root.
-if [ $(whoami) = "root" ]; then
-	echo "Install running as root. Ok."
-else
-	echo "Install needs root permissions. FAILED: Running as user"
-	exit 1
-fi
-
 #Checking distro
 if [ "$(ls /etc | grep debian_version)" = "debian_version" ]; then
 	echo "Debian distro detected."
 #Install tftpd/dhcp
 apt-get install tftpd-hpa isc-dhcp-server apache2 -y
+
 
 #Define tftp directory
 rm /etc/default/tftpd-hpa
@@ -139,6 +138,21 @@ else
 	echo "Unknown version. FAILED"
 	exit 1
 fi
+
+if [ "$(ls /etc | grep debian_version)" = "debian_version" ]; then
+	#Configure DHCP server Debian
+	cp $a/needed-files/debian/dhcpd.conf /etc/dhcp/dhcpd.conf
+elif [ $(ls /etc | grep redhat-release) = "redhat-release" ]; then
+	#Configure DHCP server rhel
+	cp $a/needed-files/rhel/dhcp/dhcpd.conf /etc/dhcp/dhcpd.conf
+else
+	exit 1
+fi
+
+sed -i "s/NETMASK/$b/g" /etc/dhcp/dhcpd.conf
+sed -i "s/SUBNET/$c/g" /etc/dhcp/dhcpd.conf
+sed -i "s/IP ADDRESS/$d/g" /etc/dhcp/dhcpd.conf
+sed -i "s/INTERFACESv4=""/INTERFACESv4=$f/g" /etc/default/isc-dhcp-server && sed -i 's/""//g' /etc/default/isc-dhcp-server
 
 #Build directory structure
 mkdir /tftpboot
@@ -266,21 +280,6 @@ cp $a/needed-files/debian10/preseed.cfg /tftpboot/kickstart/debian10
 cp $a/needed-files/debian11/preseed.cfg /tftpboot/kickstart/debian11
 cp $a/needed-files/centos7/ks.cfg /tftpboot/kickstart/centos7
 cp $a/needed-files/freepbx/ks.cfg /tftpboot/kickstart/freepbx
-
-if [ "$(ls /etc | grep debian_version)" = "debian_version" ]; then
-	#Configure DHCP server Debian
-	cp $a/needed-files/debian/dhcpd.conf /etc/dhcp/dhcpd.conf
-elif [ $(ls /etc | grep redhat-release) = "redhat-release" ]; then
-	#Configure DHCP server rhel
-	cp $a/needed-files/rhel/dhcp/dhcpd.conf /etc/dhcp/dhcpd.conf
-else
-	exit 1
-fi
-
-sed -i "s/NETMASK/$b/g" /etc/dhcp/dhcpd.conf
-sed -i "s/SUBNET/$c/g" /etc/dhcp/dhcpd.conf
-sed -i "s/IP ADDRESS/$d/g" /etc/dhcp/dhcpd.conf
-sed -i "s/INTERFACESv4=""/INTERFACESv4=$f/g" /etc/default/isc-dhcp-server && sed -i 's/""//g' /etc/default/isc-dhcp-server
 
 #Create links
 cd /var/www/html
