@@ -23,7 +23,7 @@
 echo "This script installs a TFTP server, DHCP server, and downloads several ISO files."
 echo "Be careful when running this script if you already have a DHCP server running."
 read -r -p "Do you still wish to run this script? (y/n) " e
-if [ -z $d ] || [ n = $d ]
+if [ -z $e ] || [ n = $e ]
 then
 	exit 1
 fi
