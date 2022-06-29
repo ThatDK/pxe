@@ -291,11 +291,6 @@ ln -s ../../pxelinux.cfg/default .
 cd /tftpboot/UEFI/pxelinux.cfg/
 ln -s ../../pxelinux.cfg/default .
 
-sed -i '1s/^/#Make sure to change the IPs to the IP of your system.\n/' /etc/dhcp/dhcpd.conf
-nano /etc/dhcp/dhcpd.conf
-sed -i '1s/^/#Make sure to change the IPs to the IP of your system.\n/' /tftpboot/pxelinux.cfg/default
-nano /tftpboot/pxelinux.cfg/default
-
 #Restart needed services
 if [ $(ls /etc | grep debian_version) = "debian_version" ]; then
 	systemctl restart tftp-hpa.service
