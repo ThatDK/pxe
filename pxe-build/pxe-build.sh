@@ -82,18 +82,16 @@ fi
 
 #Dowloading syslinux
 echo 'Downloading syslinux'
-wget --no-check-certificate https://mirrors.edge.kernel.org/pub/linux/utils/boot/syslinux/Testing/6.03/syslinux-6.03-pre9.tar.gz -O $a/needed-files/syslinux-6.03-pre9.tar.gz
+wget --no-check-certificate https://mirrors.edge.kernel.org/pub/linux/utils/boot/syslinux/Testing/6.04/syslinux-6.04-pre1.tar.gz -O $a/needed-files/syslinux-6.04-pre1.tar.gz
 
 #Unpacking syslinux
 echo 'Unpacking'
-cd $a/needed-files
-tar -xvzf syslinux-6.03-pre9.tar.gz >> /dev/null
-rm syslinux-6.03-pre9.tar.gz
-cd $a
+tar -xvzf syslinux-6.04-pre1.tar.gz -C $a/needed-files/
+rm $a/needed-files/syslinux-6.04-pre1.tar.gz
 
 #Checking for needed files
 if [ "$(ls $a/needed-files/debian | grep dhcpd.conf)" = "dhcpd.conf" ] &&\
-[ "$(ls $a/needed-files | grep syslinux-6.03-pre9)" = "syslinux-6.03-pre9" ]; then
+[ "$(ls $a/needed-files | grep syslinux-6.04-pre1)" = "syslinux-6.04-pre1" ]; then
 	echo "Setup files found."
 else
 	echo "Failed to locate needed files."
@@ -101,7 +99,7 @@ else
 fi
 
 #renaming syslinux
-mv $a/needed-files/syslinux-6.03-pre9 $a/needed-files/syslinux-6.03
+mv $a/needed-files/syslinux-6.04-pre1 $a/needed-files/syslinux-6.03
 
 #Checking distro
 if [ "$(ls /etc | grep debian_version)" = "debian_version" ]; then
@@ -169,12 +167,11 @@ mkdir /tftpboot/UEFI/pxelinux.cfg
 chmod 755 /tftpboot
 
 #Pull ISOs
-cd /tftpboot/distros/iso/
-wget --no-check-certificate http://mirrors.gigenet.com/centos/7.9.2009/isos/x86_64/CentOS-7-x86_64-DVD-2009.iso
-wget --no-check-certificate https://cdimage.debian.org/cdimage/archive/11.1.0/amd64/iso-dvd/debian-11.1.0-amd64-DVD-1.iso
-wget --no-check-certificate https://cdimage.debian.org/cdimage/archive/10.11.0/amd64/iso-dvd/debian-10.11.0-amd64-DVD-1.iso
-wget --no-check-certificate https://cdimage.debian.org/cdimage/archive/9.13.0/amd64/iso-dvd/debian-9.13.0-amd64-DVD-1.iso
-wget --no-check-certificate https://downloads.freepbxdistro.org/ISO/SNG7-PBX-64bit-2104-1.iso
+wget --no-check-certificate -O /tftpboot/distros/iso/CentOS-7-x86_64-DVD-2009.iso http://mirrors.gigenet.com/centos/7.9.2009/isos/x86_64/CentOS-7-x86_64-DVD-2009.iso
+wget --no-check-certificate -O /tftpboot/distros/iso/debian-11.1.0-amd64-DVD-1.iso https://cdimage.debian.org/cdimage/archive/11.1.0/amd64/iso-dvd/debian-11.1.0-amd64-DVD-1.iso
+wget --no-check-certificate -O /tftpboot/distros/iso/debian-10.11.0-amd64-DVD-1.iso https://cdimage.debian.org/cdimage/archive/10.11.0/amd64/iso-dvd/debian-10.11.0-amd64-DVD-1.iso
+wget --no-check-certificate -O /tftpboot/distros/iso/debian-9.13.0-amd64-DVD-1.iso https://cdimage.debian.org/cdimage/archive/9.13.0/amd64/iso-dvd/debian-9.13.0-amd64-DVD-1.iso
+wget --no-check-certificate -O /tftpboot/distros/iso/SNG7-PBX-64bit-2104-1.iso https://downloads.freepbxdistro.org/ISO/SNG7-PBX-64bit-2104-1.iso
 
 #Build BIOS/UEFI menu structures
 cp $a/needed-files/syslinux-6.03/bios/com32/menu/menu.c32 /tftpboot/BIOS
@@ -198,34 +195,34 @@ MENU TITLE PXE Menu
 LABEL Debian11
 	TEXT HELP Seeded Installer
 	ENDTEXT
-	kernel tftp://$d/distros/debian11/install.amd/linux
-	initrd tftp://$d/distros/debian11/install.amd/initrd.gz
+	kernel http://$d/distros/debian11/install.amd/linux
+	initrd http://$d/distros/debian11/install.amd/initrd.gz
 	append vga=normal priority=high
-#auto=true auto url=tftp://$d/kickstart/debian11/preseed.cfg
+#auto=true auto url=http://$d/kickstart/debian11/preseed.cfg
 
 LABEL Debian10
 	TEXT HELP Seeded Installer
 	ENDTEXT
-	kernel tftp://$d/distros/debian10/install.amd/linux
-	initrd tftp://$d/distros/debian10/install.amd/initrd.gz
+	kernel http://$d/distros/debian10/install.amd/linux
+	initrd http://$d/distros/debian10/install.amd/initrd.gz
 	append vga=normal priority=high
-#auto=true auto url=tftp://$d/kickstart/debian10/preseed.cfg
+#auto=true auto url=http://$d/kickstart/debian10/preseed.cfg
 
 LABEL Debian9
 	TEXT HELP Seeded Installer
 	ENDTEXT
-	kernel tftp://$d/distros/debian9/install.amd/linux
-	initrd tftp://$d/distros/debian9/install.amd/initrd.gz
+	kernel http://$d/distros/debian9/install.amd/linux
+	initrd http://$d/distros/debian9/install.amd/initrd.gz
 	append vga=normal priority=high
-#auto=true auto url=tftp://$d/kickstart/debian9/preseed.cfg
+#auto=true auto url=http://$d/kickstart/debian9/preseed.cfg
 
 MENU SEPARATOR
 
 LABEL CentOS7
 	TEXT HELP Seeded Installer
 	ENDTEXT
-	kernel tftp://$d/distros/centos7/images/pxeboot/vmlinuz
-	initrd tftp://$d/distros/centos7/images/pxeboot/initrd.img
+	kernel http://$d/distros/centos7/images/pxeboot/vmlinuz
+	initrd http://$d/distros/centos7/images/pxeboot/initrd.img
 	append vga=normal priority=high method=http://$d/distros/centos7/
 #ks=http://$d/kickstart/centos7/ks.cfg
 
@@ -234,45 +231,33 @@ MENU SEPARATOR
 LABEL FreePBX
 	TEXT HELP Unseeded Installer
 	ENDTEXT
-	kernel tftp://$d/distros/freepbx/images/pxeboot/vmlinuz
-	initrd tftp://$d/distros/freepbx/images/pxeboot/initrd.img
+	kernel http://$d/distros/freepbx/images/pxeboot/vmlinuz
+	initrd http://$d/distros/freepbx/images/pxeboot/initrd.img
 	append vga=normal priority=high method=http://$d/distros/freepbx/
 #ks=http://$d/kickstart/freepbx/ks.cfg" >> /tftpboot/pxelinux.cfg/default
 
 #Unpack ISOs
-cd /tftpboot/distros/iso
-
-mount CentOS-7-x86_64-DVD-2009.iso /mnt
+mount /tftpboot/distros/iso/CentOS-7-x86_64-DVD-2009.iso /mnt
 cp -r /mnt/* /tftpboot/distros/centos7
 umount /mnt
 
-mount debian-9.13.0-amd64-DVD-1.iso /mnt
+mount /tftpboot/distros/iso/debian-9.13.0-amd64-DVD-1.iso /mnt
 cp -r /mnt/* /tftpboot/distros/debian9
+wget --no-check-certificate -O /tftpboot/distros/debian9/install.amd/initrd.gz http://http.us.debian.org/debian/dists/jessie/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
+wget --no-check-certificate -O /tftpboot/distros/debian9/install.amd/linux http://http.us.debian.org/debian/dists/jessie/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
 umount /mnt
 
-mount debian-10.11.0-amd64-DVD-1.iso /mnt
-cp -r /mnt/* /tftpboot/distros/debian10
+mount /tftpboot/distros/iso/debian-10.11.0-amd64-DVD-1.iso /mnt
+cp -r /mnt/* /tftpboot/distros/debian10/
+wget --no-check-certificate -O /tftpboot/distros/debian10/install.amd/initrd.gz http://http.us.debian.org/debian/dists/buster/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
+wget --no-check-certificate -O /tftpboot/distros/debian10/install.amd/linux http://http.us.debian.org/debian/dists/buster/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
 umount /mnt
 
-mount debian-11.1.0-amd64-DVD-1.iso /mnt
+mount /tftpboot/distros/iso/debian-11.1.0-amd64-DVD-1.iso /mnt
 cp -r /mnt/* /tftpboot/distros/debian11
+wget --no-check-certificate -O /tftpboot/distros/debian11/install.amd/initrd.gz http://http.us.debian.org/debian/dists/bullseye/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
+wget --no-check-certificate -O /tftpboot/distros/debian11/install.amd/linux http://http.us.debian.org/debian/dists/bullseye/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
 umount /mnt
-
-#Download debian kernel/initrd
-cd /tftpboot/distros/debian11/install.amd/
-rm initrd.gz
-wget --no-check-certificate https://deb.debian.org/debian/dists/Debian11.2/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
-wget --no-check-certificate https://deb.debian.org/debian/dists/Debian11.2/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
-
-cd /tftpboot/distros/debian10/install.amd/
-rm initrd.gz
-wget --no-check-certificate https://deb.debian.org/debian/dists/Debian10.11/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
-wget --no-check-certificate https://deb.debian.org/debian/dists/Debian10.11/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
-
-cd /tftpboot/distros/debian9/install.amd/
-rm initrd.gz
-wget --no-check-certificate https://deb.debian.org/debian/dists/Debian9.13/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
-wget --no-check-certificate https://deb.debian.org/debian/dists/Debian9.13/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
 
 #Move preseeds
 cp $a/needed-files/debian9/preseed.cfg /tftpboot/kickstart/debian9
@@ -282,14 +267,11 @@ cp $a/needed-files/centos7/ks.cfg /tftpboot/kickstart/centos7
 cp $a/needed-files/freepbx/ks.cfg /tftpboot/kickstart/freepbx
 
 #Create links
-cd /var/www/html
 ln -s /tftpboot/* /var/www/html
-rm index.html
+rm /var/www/html/index.html
 
-cd /tftpboot/BIOS/pxelinux.cfg/
-ln -s ../../pxelinux.cfg/default .
-cd /tftpboot/UEFI/pxelinux.cfg/
-ln -s ../../pxelinux.cfg/default .
+ln -s ../../pxelinux.cfg/default /tftpboot/BIOS/pxelinux.cfg/default
+ln -s ../../pxelinux.cfg/default /tftpboot/UEFI/pxelinux.cfg/default
 
 #Restart needed services
 if [ $(ls /etc | grep debian_version) = "debian_version" ]; then
